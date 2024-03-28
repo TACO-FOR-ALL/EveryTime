@@ -3,14 +3,19 @@
 >모든 PAYLOAD는 JSON form을 사용
 
 1. [계정](#계정)
-    - [로그인](#로그인)
-    - [회원가입](#회원가입)
+    
 
 ## 계정
 
+- [로그인](#로그인)
+- [회원가입](#회원가입)
+- [가입가능학교리스트](#가입가능학교리스트)
+- [인증용이메일리스트요청](#인증용이메일리스트요청)
+- [인증메일발송요청](#인증메일발송요청)
+
 ### 로그인
 
-- **URL**: `/api/user/login`
+- **URL**: `/users/login`
 - **METHOD**: `POST`
 - **REOUEST PAYLOAD**:
 ```json
@@ -41,13 +46,14 @@
 
 ### 회원가입
 
-- **URL**: `/api/user/signup`
+- **URL**: `/users/signup`
 - **METHOD**: `POST`
 - **REQUEST PAYLOAD**:
 ```json
 {
     "id":"string",
     "password":"string",
+    "email":"string",
     "organization": "string"
     // TODO: 기타 정보 제공?
 }
@@ -56,7 +62,8 @@
 | - | - | - |
 |id|string|사용자ID|
 |password|string|사용자PW|
-|organization|string|사용자 소속 (학교)|
+|email|string|사용자 이메일|
+|organization_id|string|사용자 소속 학교/단체 id|
 
 - **RESPONSE PAYLOAD**:
 ```json
@@ -72,3 +79,99 @@
 
 - **추가 정보**
     - front에서 동일 **비밀번호 2회 입력** 후 동일한지 확인 필요
+
+### 가입가능학교리스트
+
+- **URL**: `/users/organization/list`
+- **METHOD**: `GET`
+- **REQUEST PAYLOAD**:
+```json
+None
+```
+
+- **RESPONSE PAYLOAD**:
+```json
+{
+    "status": "int",
+    "organizations": [
+        {
+            "name": "string",
+            "region": "string",
+            "id": "string"
+            // TODO: 추가 정보?
+        },
+        ...
+    ],
+    "error_msg": "string"
+}
+```
+|이름|타입|설명|
+| - | - | - |
+|status|int|0 - 성공; 1 - 실패 (error_msg 제공)|
+|organizations|array|가입 가능 학교/단체 list, 각 원소는 1개 학교/단체를 대표함|
+|organizations-name|string|학교/단체 이름|
+|organizations-region|string|학교/단체 소속 지역|
+|organizations-id|string|학교/단체 id (인증용 이메일 request에 사용)|
+|error_msg|string|요청 처리 실패 원인|
+
+
+### 인증용이메일리스트요청
+
+- **URL**: `/users/organization/emails`
+- **METHOD**: `POST`
+- **REQUEST PAYLOAD**:
+```json
+{
+    "id":"string"
+}
+```
+|이름|타입|설명|
+| - | - | - |
+|id|string|인증용 이메일 리스트를 요청할 학교/단체의 id|
+
+- **RESPONSE PAYLOAD**:
+```json
+{
+    "status": "int",
+    "emails":[
+        "string",
+        "string",
+        ...
+    ],
+    "error_msg": "string"
+}
+```
+|이름|타입|설명|
+| - | - | - |
+|status|int|0 - 성공; 1 - 실패 (error_msg 제공)|
+|emails|array|인증용 이메일 list, 각 원소는 1개 이메일을 뜻함|
+|error_msg|string|요청 처리 실패 원인|
+
+### 인증메일발송요청
+
+- **URL**: `/users/organization/send_auth_email`
+- **METHOD**: `POST`
+- **REQUEST PAYLOAD**:
+```json
+{
+    "organization_id": "string",
+    "email":"string",
+    // TODO: 기타 정보 제공?
+}
+```
+|이름|타입|설명|
+| - | - | - |
+|organization_id|string|사용자가 소속된 단체 id|
+|email|string|인증메일을 발송할 이메일 주소(suffix 포함), 사용자 제공|
+
+- **RESPONSE PAYLOAD**:
+```json
+{
+    "status": "int",
+    "error_msg": "string"
+}
+```
+|이름|타입|설명|
+| - | - | - |
+|status|int|0 - 발송 성공; 1 - 발송 실패 (error_msg제공)|
+|error_msg|string|인증 메일 발송 실패 원인|

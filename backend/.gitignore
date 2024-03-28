@@ -1,1 +1,8 @@
+# Python virtual dependency 폴더
 venv
+
+# 서비스 일지 폴더
+logs/*
+
+# Python Cache폴더
+__pycache__
