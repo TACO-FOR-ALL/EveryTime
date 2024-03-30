@@ -19,7 +19,7 @@ class Organization(models.Model):
 
     # 명칭
     name = models.CharField(
-        max_length=256,
+        max_length=255,
         null=False,
         blank=False,
         unique=True,
@@ -85,8 +85,8 @@ class User(AbstractUser):
     # 소속 단체
     organization = models.ForeignKey(
         Organization,
-        # on_delete=models.CASCADE
-        # 단체/학교 삭제 시 사용자도 삭제?
+        on_delete=models.PROTECT
+        # 단체/학교 삭제 시, 만약 해당 단체/학교 소속 유저가 있을 경우 오류 raise
     )
 
     # 가입 시간
