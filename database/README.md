@@ -8,9 +8,9 @@
 
 ## 구축 및 연결 방법 
 
->Windows 로컬 서버 (개발용) 기준
+### Windows 로컬 서버 (개발용)
 
-1. 알맞는 버전의 `MySQL Server` 컴포넌트 설치
+1. 알맞은 버전의 `MySQL Server` 컴포넌트 설치
     - `MySQL Workbench` 설치 권장
 2. Timezone Table 생성 및 Timezone data 입력
     1. 설정에 필요한 SQL 파일 설치 및 압축 해제
@@ -22,9 +22,16 @@
         - `SELECT COUNT(*) FROM mysql.time_zone_name;`
         - **결과가 '0'이상이어야 함**
 3. Django Backend가 사용할 DB 생성
-    - `CREATE DATABASE <db_name> DEFAULT CHARSET utf8 COLLATE utf8_general_ci;`
+    - `CREATE DATABASE <db_name> DEFAULT CHARSET utf8mb4`
         - Django는 utf8 charset을 요구
-        - utf8_general_ci는 case-insensitive comparison을 의미하지만, case-sensitive collation 선택 시, 잠재적 오류 가능성 有
 4. Django Backend `settings.py`의 `DATABASES` 설정에 `DB` 관련 정보 입력
+    - 현재 `DATABASES` 설정은 동 목록의 `database_config.py`로 분리하여 관리, 해당 파일은 깃헙에 업로드하지 않음
 5. 현재 Django Backend에 등록된 App들의 Table을 목표 DB에 생성
     - `python manage.py migrate`
+
+### Docker Container 서버 (개발용)
+1. 알맞은 버젼의 `MySQL` Image를 Docker Hub에서 Pull
+    - 현재 `mysql:8.0.36-debian` 사용 중
+2. Container 가동 스크립트 `run_db_in_docker.sh`에 로컬 환경에 맞는 변동사항을 적용하고 실행
+3. Django Backend가 사용할 DB 생성
+    - 이 부분부터는 [로컬 서버](#windows-로컬-서버-개발용)와 동일
