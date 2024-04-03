@@ -4,7 +4,8 @@
 
 ### 프론트엔드 앱 UI 프레임워크
 - **Figma UI제작**
-  - [Figma 디자인 보기](https://www.figma.com/file/oiso2S1Mf3DRqaVbrLzUrv/%EC%97%90%ED%83%80?type=design&node-id=0%3A1&mode=design&t=MchoCYCeGfS5BNWu-1)
+  - ![image](https://github.com/TACO-FOR-ALL/EveryTime/assets/79883621/669d702b-6a55-4551-a5c2-817d01f4965f)
+
 
 ### 프론트엔드 앱 개발 프레임워크
 - **React.js with Node.js**
