@@ -25,4 +25,8 @@ urlpatterns = [
     path("organization/send_auth_email", # 인증 메일 발송
          views.users_organization_send_auth_email_view,
          name='users.organization.send_auth_email'),
+
+     path("organization/check_auth_code", # 인증 코드 대조
+         views.users_email_auth_confirm_view,
+         name='users.organization.check_auth_code'),
 ]
