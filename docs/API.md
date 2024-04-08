@@ -12,6 +12,7 @@
 - [가입가능학교리스트](#가입가능학교리스트)
 - [인증용이메일리스트요청](#인증용이메일리스트요청)
 - [인증메일발송요청](#인증메일발송요청)
+- [인증코드확인요청](#인증코드확인요청)
 
 ### 로그인
 
@@ -122,12 +123,12 @@ None
 - **REQUEST PAYLOAD**:
 ```json
 {
-    "id":"string"
+    "org_id":"string"
 }
 ```
 |이름|타입|설명|
 | - | - | - |
-|id|string|인증용 이메일 리스트를 요청할 학교/단체의 id|
+|org_id|string|인증용 이메일 리스트를 요청할 학교/단체의 id|
 
 - **RESPONSE PAYLOAD**:
 ```json
@@ -156,13 +157,14 @@ None
 {
     "organization_id": "string",
     "email":"string",
-    // TODO: 기타 정보 제공?
+    "id": "string"
 }
 ```
 |이름|타입|설명|
 | - | - | - |
 |organization_id|string|사용자가 소속된 단체 id|
 |email|string|인증메일을 발송할 이메일 주소(suffix 포함), 사용자 제공|
+|id|string|인증을 진행하는 id(사용자 계정 ID)|
 
 - **RESPONSE PAYLOAD**:
 ```json
@@ -175,3 +177,33 @@ None
 | - | - | - |
 |status|int|0 - 발송 성공; 1 - 발송 실패 (error_msg제공)|
 |error_msg|string|인증 메일 발송 실패 원인|
+
+### 인증코드확인요청
+
+- **URL**: `/users/organization/check_auth_code`
+- **METHOD**: `POST`
+- **REQUEST PAYLOAD**:
+```json
+{
+    "email": "string",
+    "code":"string",
+    "id": "string"
+}
+```
+|이름|타입|설명|
+| - | - | - |
+|email|string|인증 코드를 수신한 이메일 주소|
+|code|string|인증 코드|
+|id|string|인증을 진행하는 사용자 ID|
+
+- **RESPONSE PAYLOAD**:
+```json
+{
+    "status": "int",
+    "error_msg": "string"
+}
+```
+|이름|타입|설명|
+| - | - | - |
+|status|int|0 - 인증 성공; 1 - 인증 실패 (error_msg제공)|
+|error_msg|string|코드 인증 실패 원인|
