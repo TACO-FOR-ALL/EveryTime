@@ -1,7 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest
 from django.contrib.auth import authenticate, login
+from django.db import transaction
+
 from .models import *
+from .utils import send_auth_email
 
 from utils import ViewReturn
 
@@ -100,14 +103,16 @@ def users_login_view(request: HttpRequest):
             return ViewReturn.success(content=resp)
         else:
             resp = {
-                "status" : 1,
-                "error_msg" : "ID 또는 비밀번호가 잘못되었거나 존재하지 않는 계정입니다."
-            }
-            return ViewReturn.fail(content=resp)
-    
-    
-    # TODO
-    raise NotImplementedError
+            "status" : 1,
+            "error_msg" : "해당 계정은 비활성화 상태입니다."
+        }
+        return ViewReturn.fail(content=resp)
+    else:
+        resp = {
+            "status" : 1,
+            "error_msg" : "ID 또는 비밀번호가 잘못되었거나 존재하지 않는 계정입니다."
+        }
+        return ViewReturn.fail(content=resp)
 
 
 def users_organization_list_view(request: HttpRequest):
@@ -170,7 +175,70 @@ def users_organization_send_auth_email_view(request: HttpRequest):
     # TODO
     # 1. 해당 이메일을 사용하는 계정 존재 여부
     # 2. 현재 인증 진행 중 여부 확인하여 중복 인증 발송 시 마지막 발송건으로 이전 것을 override
-    raise NotImplementedError
+    organization_id_to_use = request.POST['organization_id']
+    email_to_use = request.POST['email']
+    id_to_use = request.POST['id']
+
+    conflict_email_user = User.objects.filter(email=email_to_use).first()
+    if conflict_email_user is not None:
+        resp = {
+            "status": 1,
+            "error_msg": "해당 이메일은 이미 사용 중입니다."
+        }
+        return ViewReturn.fail(content=resp)
+    
+    obj_organization = Organization.objects.filter(id=organization_id_to_use).first()
+    if obj_organization is not None:
+        resp = {
+            "status": 1,
+            "error_msg": "잘못된 학교/단체 ID"
+        }
+        return ViewReturn.fail(content=resp)
+    
+    obj_email_suffix = '@' + email_to_use.split('@')[1]
+    obj_org_email_suffix_list = OrganizationEmail.objects.filter(organization=obj_organization)
+    if obj_email_suffix not in obj_org_email_suffix_list:
+        resp = {
+            "status": 1,
+            "error_msg": "해당 이메일은 해당 학교/단체 인증에 사용 가능한 이메일이 아닙니다."
+        }
+        return ViewReturn.fail(content=resp)
+
+    import random
+    cur_auth_code = random.randint(100000, 999999)
+
+    send_result, reason = send_auth_email(email_address=email_to_use,
+                                          content=cur_auth_code)
+    if not send_result:
+        # TODO: 인증 메일 발송 실패 LOGGING
+        resp = {
+            "status": 1,
+            "error_msg": f"서버 오류! 인증 메일 발송 실패"
+        }
+        return ViewReturn.fail(content=resp)
+    
+    try:
+        with transaction.atomic(): # 민감한 data 삭제는 transaction control
+            email_auth_to_delete_list = EmailAuthentication.objects.filter(obj_email=email_to_use)
+            for email_to_delete in email_auth_to_delete_list:
+                email_to_delete.delete()
+        
+            cur_email_auth = EmailAuthentication(auth_id=id_to_use,
+                                                obj_email=email_to_use,
+                                                auth_code=cur_auth_code)
+            cur_email_auth.save()
+    except Exception as e:
+        resp = {
+            "status": 1,
+            "error_mgs": "인증 메일 처리 중 DB 오류!"
+        }
+        return ViewReturn.fail(content=resp)
+
+    resp = {
+        "status": 0
+    }
+    return ViewReturn.success(content=resp)
+    
 
 def users_email_auth_confirm_view(request: HttpRequest):
     """
