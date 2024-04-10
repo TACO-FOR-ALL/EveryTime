@@ -1,5 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest
+from django.contrib.auth import authenticate, login
 from .models import *
 
 from utils import ViewReturn
@@ -83,6 +84,28 @@ def users_login_view(request: HttpRequest):
         API: /users/login
         기능: 로그인
     """
+    # Request Payload
+    id_to_use = request.POST['id']
+    pw_to_use = request.POST['password']
+    
+    # Authentication
+    user = authenticate(username = id_to_use, password = pw_to_use)
+    if user is not None:
+        if user.is_active:
+            login(request, user)        # session에 데이터 저장
+            resp = {
+                "status" : 0,
+                "message" : "로그인 성공"
+            }
+            return ViewReturn.success(content=resp)
+        else:
+            resp = {
+                "status" : 1,
+                "error_msg" : "ID 또는 비밀번호가 잘못되었거나 존재하지 않는 계정입니다."
+            }
+            return ViewReturn.fail(content=resp)
+    
+    
     # TODO
     raise NotImplementedError
 
