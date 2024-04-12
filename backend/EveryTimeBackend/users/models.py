@@ -154,3 +154,9 @@ class User(AbstractUser):
         """
         readable = localtime(self.signup_at).strftime('%Y-%m-%d %H:%M:%S')
         return readable
+    
+class SendMail(models.Model):
+    email = models.EmailField(unique=True, verbose = 'Mail Address')
+    
+    def __str__(self):
+        return self.email
