@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from .database_config import DATABASES
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -121,3 +122,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
     Django contrib.auth.models의 User를 기준으로 확장한 User 모델을 사용
 """
 AUTH_USER_MODEL = 'users.user'
+
+
+# 이메일 자동 전송을 위한 기본 데이터
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # SMTP 방식 채택
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_SSL = True
+EMAIL_PORT = 465
+EMAIL_HOST_USER = '메일 계정의 메일 주소'
+EMAIL_HOST_PASSWORD = os.environ.get('메일 계정의 pwd')
