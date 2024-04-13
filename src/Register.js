@@ -1,18 +1,50 @@
 import React, { useState } from 'react';
-import './RegisterForm.css'; // 스타일 시트 임포트
+import './css/RegisterForm.css'; // Make sure the CSS path is correct
 
 function RegisterForm({ onLogin }) {
+  const [id, setId] = useState('');
+  const [pw, setPw] = useState('');
+  const [pwConfirm, setPwConfirm] = useState('');
   const [name, setName] = useState('');
-  const [birth, setBirth] = useState('');
-  const [uni, setUni] = useState('');
-  const [uninum, setUninum] = useState('');
-  const [major, setMajor] = useState('');
-  const [wechat, setWechat] = useState('');
-  const [phonenum, setPhonenum] = useState('');
+  const [email, setEmail] = useState('');
+  const [organizationId, setOrganizationId] = useState('');
+  const [error, setError] = useState('');
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    onLogin(name,birth,uni,uninum,major,wechat,phonenum);
+    if (pw !== pwConfirm) {
+      setError('비밀번호를 재확인 해주세요');
+      return;
+    }
+    if (!/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d!@]{8,}$/.test(pw)) {
+      setError('비밀번호 격식을 지켜야 합니다 (영어+숫자, 특수문자: !,@)');
+      return;
+    }
+
+    const postData = {
+      id,
+      password: pw,
+      email,
+      organization: organizationId
+    };
+
+    try {
+      const response = await fetch('/users/signup', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(postData)
+      });
+      const data = await response.json();
+      if (data.status === 0) {
+        onLogin(); // Handle successful registration
+      } else {
+        setError(data.error_msg); // Display error message from the API
+      }
+    } catch (error) {
+      setError('서버와의 연결에 실패했습니다.');
+    }
   };
 
   return (
@@ -21,7 +53,31 @@ function RegisterForm({ onLogin }) {
         <h1 className="title">Everytime</h1>
         <p className="subtitle">for Foreign</p>
       </div>
-      <form onSubmit={handleSubmit} className="register-form"> 
+      <form onSubmit={handleSubmit} className="register-form">
+        <input
+          type="text"
+          className="register-input"
+          placeholder="아이디"
+          value={id}
+          onChange={(e) => setId(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          className="register-input"
+          placeholder="비밀번호"
+          value={pw}
+          onChange={(e) => setPw(e.target.value)}
+          required
+        />
+        <input
+          type="password"
+          className="register-input"
+          placeholder="비밀번호 재확인"
+          value={pwConfirm}
+          onChange={(e) => setPwConfirm(e.target.value)}
+          required
+        />
         <input
           type="name"
           className="register-input"
@@ -31,64 +87,24 @@ function RegisterForm({ onLogin }) {
           required
         />
         <input
-          type="birth"
+          type="text"
           className="register-input"
-          placeholder="생년월일"
-          value={birth}
-          onChange={(e) => setBirth(e.target.value)}
+          placeholder="이메일"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
         <input
-          type="uni"
+          type="text"
           className="register-input"
-          placeholder="학교"
-          value={uni}
-          onChange={(e) => setUni(e.target.value)}
+          placeholder="소속 학교/단체 ID"
+          value={organizationId}
+          onChange={(e) => setOrganizationId(e.target.value)}
           required
         />
-        <input
-          type="uninum"
-          className="register-input"
-          placeholder="학번"
-          value={uninum}
-          onChange={(e) => setUninum(e.target.value)}
-          required
-        />
-        <input
-          type="major"
-          className="register-input"
-          placeholder="과"
-          value={major}
-          onChange={(e) => setMajor(e.target.value)}
-          required
-        />
-        <input
-          type="wechat"
-          className="register-input"
-          placeholder="위챗"
-          value={wechat}
-          onChange={(e) => setWechat(e.target.value)}
-          required
-        />
-        <input
-          type="phonenum"
-          className="register-input"
-          placeholder="전화번호"
-          value={phonenum}
-          onChange={(e) => setPhonenum(e.target.value)}
-          required
-        />
-
-        <button type="submit" className="register-button">
-          회원가입 완료!
-        </button>
+        <button type="submit" className="register-button">회원가입 완료!</button>
+        {error && <div className="error-message">{error}</div>}
       </form>
-      <div className="links-container">
-      </div>
-      <div className="footer">
-        <span className="footer-text">
-        </span>
-      </div>
       <div className="footer-links">
         <a href="/inquiry" className="auth-link">문의하기</a>
         <a href="/privacy-policy" className="auth-link">개인정보 처리방침</a>

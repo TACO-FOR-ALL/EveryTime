@@ -1,6 +1,6 @@
 //PasswordResetPage.js
 import React, { useState } from 'react';
-import './PasswordResetPage.css'; // 비밀번호 찾기 페이지 전용 CSS 파일
+import './css/PasswordResetPage.css'; // 비밀번호 찾기 페이지 전용 CSS 파일
 import { useNavigate } from 'react-router-dom'; // useNavigate 훅 임포트
 
 function PasswordResetPage() {
@@ -44,11 +44,8 @@ function PasswordResetPage() {
         <h1>Everytime</h1>
         <p>for Foreign</p>
       </div>
-      <div className="title2">
-        <h1>비밀번호 찾기</h1>
-      </div>
       <div className="content">
-        <p>학교 이메일을 통해서 회원가입을 하실 수 있습니다</p>
+        <h3>학교 이메일을 통해서 회원가입을 하실 수 있습니다</h3>
         <input
           type="email"
           value={email}
@@ -58,7 +55,7 @@ function PasswordResetPage() {
         />
         <button
           onClick={handlePasswordReset}
-          className="reset-button"
+          className="reset-button"  
         >
           비밀번호 찾기
         </button>

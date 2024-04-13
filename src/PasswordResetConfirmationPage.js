@@ -1,6 +1,6 @@
 // PasswordResetConfirmationPage.js
 import React from 'react';
-import './PasswordResetConfirmationPage.css'; // 적절한 CSS 스타일링
+import './css/PasswordResetConfirmationPage.css'; // 적절한 CSS 스타일링
 import { useNavigate } from 'react-router-dom'; // useNavigate 훅 임포트
 
 function PasswordResetConfirmationPage() {
@@ -18,14 +18,13 @@ function PasswordResetConfirmationPage() {
         <h1>Everytime</h1>
         <p>for Foreign</p>
       </div>
-      <div className="title2">
-        <h1>비밀번호 찾기</h1>
-      </div>
       <div className="content">
-        <p>
+        <h4>
             가입된 학교 이메일로 임시 비밀번호를 발송했습니다.
+        </h4>
+        <h5>
             로그인 후 비밀번호를 새로 등록해주세요!
-        </p>
+        </h5>
         
         <button
           onClick={handleGoBackToLogin}

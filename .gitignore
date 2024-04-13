@@ -1,2 +1,4 @@
 # vscode 설정 폴더
 .vscode
+node_modules => node_modules
+.DS_Store*
