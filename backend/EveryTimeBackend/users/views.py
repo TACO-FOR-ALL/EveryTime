@@ -39,8 +39,8 @@ def users_signup_view(request: HttpRequest):
     organization_to_use = of.first()
 
     # 인증 완료 여부 확인
-    email_auth_to_check = EmailAuthentication.objects.filter(auth_id=id_to_use,
-                                                                  obj_email=email_to_use).first()
+    email_auth_to_check = EmailAuthentication.objects.filter(obj_email=email_to_use,
+                                                             auth_type=EmailAuthentication.SIGNUP).first()
     if email_auth_to_check is None: # 인증 기록 부재
         resp = {
             "status": 1,
@@ -80,7 +80,6 @@ def users_signup_view(request: HttpRequest):
         # TODO: LOGGING
         return ViewReturn.fail(content=resp)
 
-
 def users_login_view(request: HttpRequest):
     """
         Developer: 
@@ -113,6 +112,15 @@ def users_login_view(request: HttpRequest):
             "error_msg" : "ID 또는 비밀번호가 잘못되었거나 존재하지 않는 계정입니다."
         }
         return ViewReturn.fail(content=resp)
+
+def users_reset_password_send_auth_email_view(request: HttpRequest):
+    """
+        Developer: 
+        API: /users/reset-password/send_auth_email
+        기능: 가입 시 사용한 이메일을 받아 비밀번호 리셋용 인증 코드 전송
+    """
+    # TODO
+    raise NotImplementedError
 
 
 def users_organization_list_view(request: HttpRequest):
@@ -177,7 +185,6 @@ def users_organization_send_auth_email_view(request: HttpRequest):
     # 2. 현재 인증 진행 중 여부 확인하여 중복 인증 발송 시 마지막 발송건으로 이전 것을 override
     organization_id_to_use = request.POST['organization_id']
     email_to_use = request.POST['email']
-    id_to_use = request.POST['id']
 
     conflict_email_user = User.objects.filter(email=email_to_use).first()
     if conflict_email_user is not None:
@@ -219,13 +226,14 @@ def users_organization_send_auth_email_view(request: HttpRequest):
     
     try:
         with transaction.atomic(): # 민감한 data 삭제는 transaction control
-            email_auth_to_delete_list = EmailAuthentication.objects.filter(obj_email=email_to_use)
+            email_auth_to_delete_list = EmailAuthentication.objects.filter(obj_email=email_to_use,
+                                                                           auth_type=EmailAuthentication.SIGNUP)
             for email_to_delete in email_auth_to_delete_list:
                 email_to_delete.delete()
         
-            cur_email_auth = EmailAuthentication(auth_id=id_to_use,
-                                                obj_email=email_to_use,
-                                                auth_code=cur_auth_code)
+            cur_email_auth = EmailAuthentication(obj_email=email_to_use,
+                                                 auth_code=cur_auth_code,
+                                                 auth_type=EmailAuthentication.SIGNUP)
             cur_email_auth.save()
     except Exception as e:
         resp = {
@@ -244,17 +252,17 @@ def users_email_auth_confirm_view(request: HttpRequest):
     """
         Developer: Macchiato
         API: /users/organization/check_auth_code
-        기능: 사용자가 frontend에 입력한 인증코드와 발송한 인증코드 대조 및 
+        기능: 사용자가 frontend에 입력한 인증코드와 발송한 인증코드 대조
     """
     email_to_check = request.POST['email']
     code_to_check = request.POST['code']
-    id_to_use = request.POST['id']
 
-    obj_EmailAuth = EmailAuthentication.objects.filter(auth_id=id_to_use).first()
+    obj_EmailAuth = EmailAuthentication.objects.filter(obj_email=email_to_check,
+                                                       auth_type=EmailAuthentication.SIGNUP).first()
     if obj_EmailAuth is None:
         resp = {
             "status": 1,
-            "error_msg": f"잘못된 ID: {id_to_use}, 해당 ID는 인증 요청을 발송하지 않았습니다."
+            "error_msg": f"잘못된 이메일: {email_to_check}, 해당 ID는 인증 요청을 발송하지 않았습니다."
         }
         return ViewReturn.fail(content=resp)
     
@@ -262,13 +270,6 @@ def users_email_auth_confirm_view(request: HttpRequest):
         resp = {
             "status": 1,
             "error_msg": f"잘못된 인증코드: {code_to_check}"
-        }
-        return ViewReturn.fail(content=resp)
-
-    if obj_EmailAuth.obj_email != email_to_check:
-        resp = {
-            "status": 1,
-            "error_msg": f"잘못된 인증코드 수신 메일: {email_to_check}"
         }
         return ViewReturn.fail(content=resp)
     

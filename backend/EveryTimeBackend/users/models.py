@@ -84,20 +84,10 @@ class EmailAuthentication(models.Model):
         해당 Table에 임시적인 데이터를 저장함.
         BackgroundTask를 통해 정기적인 데이터 청소 필요.
     """
-    # 인증을 진행하는 사용자 계정 ID
-    auth_id = models.CharField(
-        primary_key=True,
-        max_length=255,
-        editable=False,
-        default="example"
-    )
-
-    # 인증 메일을 발송한 메일 주소
-    obj_email = models.CharField(
-        max_length=128,
+    obj_email = models.EmailField(
+        default='taco@example.com',
         null=False,
-        blank=False,
-        default='@example.com'
+        blank=False
     )
     
     # 발송한 인증 코드
@@ -115,6 +105,29 @@ class EmailAuthentication(models.Model):
     verified = models.BooleanField(
         default=False
     )
+
+    # 인증 유형
+    # 먼저 선택사항들을 정의하고 아래 choices에 등록
+    # 선택사항:
+    SIGNUP = 'signup'
+    PWRESET = 'pwreset'
+
+    auth_type = models.CharField(
+        max_length=16,
+        null=False,
+        blank=False,
+        choices={
+            SIGNUP: "회원가입",
+            PWRESET: "비밀번호리셋"
+        },
+        default=SIGNUP,
+    )
+
+    def get_auth_type(self):
+        """
+            기능: 이메일 인증 유형 제공
+        """
+        return self.auth_type
 
     def time_diff(self):
         """

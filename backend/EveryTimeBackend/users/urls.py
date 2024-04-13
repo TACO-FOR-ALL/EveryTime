@@ -14,6 +14,10 @@ urlpatterns = [
          views.users_login_view,
          name='users.login'),
 
+     path("reset-password/send_auth_email",  # 비밀번호 리셋용 인증 메일 발송
+         views.users_reset_password_send_auth_email_view,
+         name='users.reset_password.send_auth_email'),
+
     path("organization/list", # 가입 가능 학교/단체 리스트
          views.users_organization_list_view,
          name='users.organization.list'),
