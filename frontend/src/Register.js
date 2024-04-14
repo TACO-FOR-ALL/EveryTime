@@ -29,7 +29,7 @@ function RegisterForm({ onLogin }) {
     };
 
     try {
-      const response = await fetch('/users/signup', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api/users/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

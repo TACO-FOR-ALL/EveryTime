@@ -11,7 +11,7 @@ function PasswordResetPage() {
   const handlePasswordReset = async () => {
     try {
       // 백엔드로 이메일을 전송하여 비밀번호 재설정 요청
-      const response = await fetch('/api/password-reset', {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api/users/password-reset`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
