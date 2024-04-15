@@ -11,7 +11,7 @@ function LoginForm({ onLogin }) {
     const handleSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api/users/login`, {
+            const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/users/login`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
