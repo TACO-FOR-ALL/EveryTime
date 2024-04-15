@@ -64,7 +64,6 @@ class Organization(models.Model):
         verbose_name='학교/단체'
         verbose_name_plural='학교/단체들'
 
-
 class OrganizationEmail(models.Model):
     """
         학교/단체 인증용 이메일
@@ -168,7 +167,6 @@ class EmailAuthentication(models.Model):
         ordering=['sent_at']
         verbose_name='가입 인증 메일 발송 기록'
         verbose_name_plural='가입 인증 메일 발송 기록들'
-
 
 class User(AbstractUser):
     """

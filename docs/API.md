@@ -22,13 +22,13 @@
 - **REOUEST PAYLOAD**:
 ```json
 {
-    "id":"string",
+    "username":"string",
     "password":"string"
 }
 ```
 |이름|타입|설명|
 | - | - | - |
-|id|string|사용자ID|
+|username|string|사용자ID|
 |password|string|사용자PW|
 
 - **RESPONSE PAYLOAD**:
@@ -53,7 +53,7 @@
 - **REQUEST PAYLOAD**:
 ```json
 {
-    "id":"string",
+    "username":"string",
     "password":"string",
     "email":"string",
     "organization": "string"
@@ -62,10 +62,10 @@
 ```
 |이름|타입|설명|
 | - | - | - |
-|id|string|사용자ID|
+|username|string|사용자ID|
 |password|string|사용자PW|
 |email|string|사용자 이메일|
-|organization_id|string|사용자 소속 학교/단체 id|
+|organization|string|사용자 소속 학교/단체 id|
 
 - **RESPONSE PAYLOAD**:
 ```json
