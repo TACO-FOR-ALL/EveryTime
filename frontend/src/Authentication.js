@@ -16,7 +16,7 @@ function Authentication({ onLogin }) {
     };
 
     try {
-      const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/api/users/organization/check_auth_code`, {
+      const response = await fetch(`${process.env.REACT_APP_BACKEND_HOST}/users/organization/check_auth_code`, {
         //const response = await fetch('/users/organization/check_auth_code', {
         method: 'POST',
         headers: {
