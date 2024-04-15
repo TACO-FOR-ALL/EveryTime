@@ -1,8 +1,9 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.db import transaction
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate
 from .models import *
 from .serializers import *
 from .utils import *
@@ -141,6 +142,7 @@ class users_organization_send_auth_email_view(APIView):
             )
         except Exception as e: # 서버 에러
             # TODO: LOGGING using str(e)
+            print(str(e))
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -258,7 +260,7 @@ class users_login_view(APIView):
     """
         Developer: 박시현
         API: /users/login
-        기능: 로그인
+        기능: 로그인, JWT인증 중 TokenObtainPairView의 역할을 함.
     """
     def post(self, request):
         try:
@@ -279,10 +281,17 @@ class users_login_view(APIView):
                     status=status.HTTP_401_UNAUTHORIZED
                 )
             
-            login(request, user)
-            # TODO: JWT Authentication?
-
-            return Response(data=ResponseContent.success())
+            # jwt token
+            refresh = RefreshToken.for_user(user)
+            return Response(
+                data=ResponseContent.success(
+                    data={
+                        'refresh': str(refresh),
+                        'access': str(refresh.access_token)
+                    },
+                    data_field_name='tokens'
+                )
+            )
         except Exception as e:
             # TODO: LOGGING using str(e)
             return Response(

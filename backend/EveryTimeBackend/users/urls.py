@@ -1,4 +1,5 @@
 from django.urls import path
+from rest_framework_simplejwt.views import TokenRefreshView
 
 from . import views
 
@@ -13,6 +14,10 @@ urlpatterns = [
     path("login",  # 로그인
          views.users_login_view.as_view(),
          name='users.login'),
+
+     path("refresh-access-token", # JWT access token 리프레시
+          TokenRefreshView.as_view(),
+          name='users.refresh_access_token'),
 
      path("reset-password/send_auth_email",  # 비밀번호 리셋용 인증 메일 발송
          views.users_reset_password_send_auth_email_view.as_view(),

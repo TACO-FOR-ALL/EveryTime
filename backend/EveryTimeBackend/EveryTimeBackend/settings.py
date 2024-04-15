@@ -134,5 +134,5 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    # TODO
+    'BLACKLIST_AFTER_ROTATION': True
 }
