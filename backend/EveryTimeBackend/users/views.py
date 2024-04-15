@@ -1,3 +1,4 @@
+import json
 from django.contrib.auth.decorators import login_required
 from django.http import HttpRequest
 from django.contrib.auth import authenticate, login
@@ -6,7 +7,7 @@ from django.db import transaction
 from .models import *
 from .utils import send_auth_email
 
-from utils import ViewReturn
+from EveryTimeBackend.utils import ViewReturn
 
 def users_signup_view(request: HttpRequest):
     """
@@ -14,11 +15,11 @@ def users_signup_view(request: HttpRequest):
         API: /users/signup
         기능: 회원가입
     """
-    # Request Payload
-    id_to_use = request.POST['id']
-    pw_to_use = request.POST['password']
-    email_to_use = request.POST['email']
-    organization_id_to_use = request.POST['organization_id']
+    request_data = json.loads(request.body)
+    id_to_use = request_data.get('id')
+    pw_to_use = request_data.get('password')
+    email_to_use = request_data.get('email')
+    organization_id_to_use = request_data.get('organization_id')
 
     # username 확인
     if User.objects.filter(username=id_to_use).exists():
@@ -86,9 +87,9 @@ def users_login_view(request: HttpRequest):
         API: /users/login
         기능: 로그인
     """
-    # Request Payload
-    id_to_use = request.POST['id']
-    pw_to_use = request.POST['password']
+    request_data = json.loads(request.body)
+    id_to_use = request_data.get('id')
+    pw_to_use = request_data.get('password')
     
     # Authentication
     user = authenticate(username = id_to_use, password = pw_to_use)
@@ -153,7 +154,8 @@ def users_organization_mails_view(request: HttpRequest):
         기능: 선택한 학교/단체에서 인증에 사용할 수 있는 메일 제공
     """
     # 학교/단체 query
-    org_id_to_use = request.POST['org_id']
+    request_data = json.loads(request.body)
+    org_id_to_use = request_data.get('org_id')
     obj_org = Organization.objects.filter(id=org_id_to_use).first()
 
     # 해당 학교/단체 없음
@@ -180,11 +182,9 @@ def users_organization_send_auth_email_view(request: HttpRequest):
         API: /users/organization/send_auth_email
         기능: 사용자가 제공한 이메일로 인증 메일 발송
     """
-    # TODO
-    # 1. 해당 이메일을 사용하는 계정 존재 여부
-    # 2. 현재 인증 진행 중 여부 확인하여 중복 인증 발송 시 마지막 발송건으로 이전 것을 override
-    organization_id_to_use = request.POST['organization_id']
-    email_to_use = request.POST['email']
+    request_data = json.loads(request.body)
+    organization_id_to_use = request_data.get('organization_id')
+    email_to_use = request_data.get('email')
 
     conflict_email_user = User.objects.filter(email=email_to_use).first()
     if conflict_email_user is not None:
@@ -254,8 +254,9 @@ def users_email_auth_confirm_view(request: HttpRequest):
         API: /users/organization/check_auth_code
         기능: 사용자가 frontend에 입력한 인증코드와 발송한 인증코드 대조
     """
-    email_to_check = request.POST['email']
-    code_to_check = request.POST['code']
+    request_data = json.loads(request.body)
+    email_to_check = request_data.get('email')
+    code_to_check = request_data.get('code')
 
     obj_EmailAuth = EmailAuthentication.objects.filter(obj_email=email_to_check,
                                                        auth_type=EmailAuthentication.SIGNUP).first()

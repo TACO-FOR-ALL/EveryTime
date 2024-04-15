@@ -7,3 +7,4 @@ from .models import *
 admin.site.register(User, UserAdmin)
 admin.site.register(Organization)
 admin.site.register(OrganizationEmail)
+admin.site.register(EmailAuthentication)

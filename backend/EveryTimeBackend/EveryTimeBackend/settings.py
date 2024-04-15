@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from .database_config import DATABASES
-from ..users.mail_config import MAIL
+from .mail_config import MAIL
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -39,7 +39,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'users.apps.UsersConfig', # 유저 관리 app
+    #'users.apps.UsersConfig', # 유저 관리 app
+    'rest_framework',
+    'users'
 ]
 
 MIDDLEWARE = [
@@ -96,6 +98,7 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/5.0/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
+#LANGUAGE_CODE = 'ko-kr'
 
 TIME_ZONE = 'Asia/Shanghai'
 
@@ -122,3 +125,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
     Django contrib.auth.models의 User를 기준으로 확장한 User 모델을 사용
 """
 AUTH_USER_MODEL = 'users.user'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}

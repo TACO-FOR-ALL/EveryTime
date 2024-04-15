@@ -2,7 +2,7 @@ from typing import Tuple
 from django.core.mail import send_mail
 from django.core.mail import BadHeaderError
 
-from .mail_config import MAIL
+from django.conf import settings
 
 
 
@@ -22,7 +22,7 @@ def send_auth_email(email_address: str, content: str) -> Tuple:
     try:
         send_mail(subject=subject,
                   message=message.format(content=content),
-                  from_email=MAIL['default']['EMAIL_HOST_USER'], # TODO: 추후 수정이 필요할 것으로 보임
+                  from_email=settings.MAIL['default']['EMAIL_HOST_USER'], # TODO: 추후 수정이 필요할 것으로 보임
                   recipient_list=[email_address])
         return (True, None)
     except BadHeaderError:
