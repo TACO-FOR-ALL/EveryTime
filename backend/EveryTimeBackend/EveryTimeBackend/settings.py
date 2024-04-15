@@ -39,9 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'users.apps.UsersConfig', # 유저 관리 app
-    'rest_framework',
-    'users'
+    'rest_framework', # DRF
+    'users', # 유저 관리 app
 ]
 
 MIDDLEWARE = [
@@ -128,6 +127,12 @@ AUTH_USER_MODEL = 'users.user'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework_simplejwt.authentication.JWTAuthentication', # jwt인증
     ],
+}
+
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    # TODO
 }

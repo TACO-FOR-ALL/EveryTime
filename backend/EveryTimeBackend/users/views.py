@@ -1,290 +1,301 @@
-import json
-from django.contrib.auth.decorators import login_required
-from django.http import HttpRequest
-from django.contrib.auth import authenticate, login
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from django.db import transaction
-
+from django.contrib.auth import authenticate, login
 from .models import *
-from .utils import send_auth_email
+from .serializers import *
+from .utils import *
 
-from EveryTimeBackend.utils import ViewReturn
+from EveryTimeBackend.utils import ResponseContent
 
-def users_signup_view(request: HttpRequest):
-    """
-        Developer: Macchiato
-        API: /users/signup
-        기능: 회원가입
-    """
-    request_data = json.loads(request.body)
-    id_to_use = request_data.get('id')
-    pw_to_use = request_data.get('password')
-    email_to_use = request_data.get('email')
-    organization_id_to_use = request_data.get('organization_id')
-
-    # username 확인
-    if User.objects.filter(username=id_to_use).exists():
-        resp = {
-            "status": 1,
-            "error_msg": f"해당 ID: {id_to_use}는 사용 중입니다."
-        }
-        return ViewReturn.fail(content=resp)
-    
-    # 학교/단체 확인
-    of = Organization.objects.filter(id=organization_id_to_use)
-    if len(of) == 0:
-        resp = {
-            "status": 1,
-            "error_msg": f"잘못된 학교/단체 ID: {organization_id_to_use}"
-        }
-        return ViewReturn.fail(content=resp)
-    organization_to_use = of.first()
-
-    # 인증 완료 여부 확인
-    email_auth_to_check = EmailAuthentication.objects.filter(obj_email=email_to_use,
-                                                             auth_type=EmailAuthentication.SIGNUP).first()
-    if email_auth_to_check is None: # 인증 기록 부재
-        resp = {
-            "status": 1,
-            "error_msg": f"해당 ID: {id_to_use}/email: {email_to_use}는 인증을 진행하지 않았거나 인증 완료 후 가입까지의 제한 시간이 경과하였습니다."
-        }
-        return ViewReturn.fail(content=resp)
-    # 인증 완료 시 인증 완료 기록 삭제
-    try:
-        email_auth_to_check.delete()
-    except Exception as e:
-        resp = {
-            "status": 1,
-            "error_msg": "서버 오류!"
-        }
-        # TODO: LOGGING
-        return ViewReturn.fail(content=resp)
-
-    # 가입 진행
-    try:
-        new_user = User(
-            username=id_to_use,
-            password=pw_to_use,
-            email=email_to_use,
-            organization=organization_to_use
-        )
-        new_user.save()
-
-        resp = {
-            "status": 0
-        }
-        return ViewReturn.success(content=resp)
-    except Exception as e:
-        resp = {
-            "status": 1,
-            "error_msg": "서버 오류!"
-        }
-        # TODO: LOGGING
-        return ViewReturn.fail(content=resp)
-
-def users_login_view(request: HttpRequest):
-    """
-        Developer: 
-        API: /users/login
-        기능: 로그인
-    """
-    request_data = json.loads(request.body)
-    id_to_use = request_data.get('id')
-    pw_to_use = request_data.get('password')
-    
-    # Authentication
-    user = authenticate(username = id_to_use, password = pw_to_use)
-    if user is not None:
-        if user.is_active:
-            login(request, user)        # session에 데이터 저장
-            resp = {
-                "status" : 0,
-                "message" : "로그인 성공"
-            }
-            return ViewReturn.success(content=resp)
-        else:
-            resp = {
-            "status" : 1,
-            "error_msg" : "해당 계정은 비활성화 상태입니다."
-        }
-        return ViewReturn.fail(content=resp)
-    else:
-        resp = {
-            "status" : 1,
-            "error_msg" : "ID 또는 비밀번호가 잘못되었거나 존재하지 않는 계정입니다."
-        }
-        return ViewReturn.fail(content=resp)
-
-def users_reset_password_send_auth_email_view(request: HttpRequest):
-    """
-        Developer: 
-        API: /users/reset-password/send_auth_email
-        기능: 가입 시 사용한 이메일을 받아 비밀번호 리셋용 인증 코드 전송
-    """
-    # TODO
-    raise NotImplementedError
-
-
-def users_organization_list_view(request: HttpRequest):
+class users_organization_list_view(APIView):
     """
         Developer: Macchiato
         API: /users/organization/list
         기능: 가입 가능 학교/단체 리스트 제공
     """
-    # 학교/단체 리스트 query
-    organizations = Organization.objects.all()
-    data = []
-    for org in organizations:
-        cur_org = {
-            "name": org.name,
-            "region": org.region,
-            "id": org.id
-        }
-        data.append(cur_org)
-
-    resp = {
-        "status": 0,
-        "organizations": data
-    }
-    return ViewReturn.success(content=resp)
-
-def users_organization_mails_view(request: HttpRequest):
+    def get(self, request):
+        try:
+            organizations = Organization.objects.all()
+            serializer = OrganizationSerializer(organizations, many=True)
+            return Response(data=ResponseContent.success(data=serializer.data,
+                                                         data_field_name='organizations'))
+        except Exception as e: # 서버 에러
+            # TODO: LOGGING
+            return Response(
+                data=ResponseContent.fail("서버 에러!"),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+class users_organization_mails_view(APIView):
     """
         Developer: Macchiato
         API: /users/organization/emails
         기능: 선택한 학교/단체에서 인증에 사용할 수 있는 메일 제공
     """
-    # 학교/단체 query
-    request_data = json.loads(request.body)
-    org_id_to_use = request_data.get('org_id')
-    obj_org = Organization.objects.filter(id=org_id_to_use).first()
+    def post(self, request):
+        try:
+            org_id_to_use = request.data.get('org_id')
 
-    # 해당 학교/단체 없음
-    if obj_org is None:
-        resp = {
-            "status": 1,
-            "error_msg": "해당 ID를 사용하는 학교/단체가 존재하지 않습니다."
-        }
-        return ViewReturn.fail(content=resp)
+            # Request에서 id 미제공
+            if org_id_to_use is None:
+                return Response(
+                    ResponseContent.fail("Request에서 학교/단체 ID을 제공하지 않았습니다."),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            obj_org = Organization.objects.filter(id=org_id_to_use).first()
+            # 해당 ID를 사용하는 학교/단체 없음
+            if obj_org is None:
+                return Response(
+                    ResponseContent.fail(f"ID: {org_id_to_use}를 사용하는 학교/단체가 존재하지 않습니다."),
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # 해당 학교/단체 email suffix query
+            org_emails = OrganizationEmail.objects.filter(organization=obj_org).all()
+            email_serializer = OrganizationEmailListSerializer(org_emails,
+                                                               many=True)
+            return Response(data=ResponseContent.success(data=email_serializer.data,
+                                                         data_field_name='emails'))
 
-    # 해당 학교/단체 email suffix query
-    org_emails = OrganizationEmail.objects.filter(organization=obj_org).all()
-    data = [email.suffix for email in org_emails]
+        except Exception as e: # 서버 에러
+            # TODO: LOGGING
+            return Response(
+                data=ResponseContent.fail("서버 에러!"),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
-    resp = {
-        "status": 0,
-        "emails": data
-    }
-    return ViewReturn.success(content=resp)
-
-def users_organization_send_auth_email_view(request: HttpRequest):
+class users_organization_send_auth_email_view(APIView):
     """
         Developer: 
         API: /users/organization/send_auth_email
         기능: 사용자가 제공한 이메일로 인증 메일 발송
     """
-    request_data = json.loads(request.body)
-    organization_id_to_use = request_data.get('organization_id')
-    email_to_use = request_data.get('email')
+    def post(self, request):
+        try:
+            org_id_to_use = request.data.get('organization_id')
+            email_to_use = request.data.get('email')
 
-    conflict_email_user = User.objects.filter(email=email_to_use).first()
-    if conflict_email_user is not None:
-        resp = {
-            "status": 1,
-            "error_msg": "해당 이메일은 이미 사용 중입니다."
-        }
-        return ViewReturn.fail(content=resp)
-    
-    obj_organization = Organization.objects.filter(id=organization_id_to_use).first()
-    if obj_organization is not None:
-        resp = {
-            "status": 1,
-            "error_msg": "잘못된 학교/단체 ID"
-        }
-        return ViewReturn.fail(content=resp)
-    
-    obj_email_suffix = '@' + email_to_use.split('@')[1]
-    obj_org_email_suffix_list = OrganizationEmail.objects.filter(organization=obj_organization)
-    if obj_email_suffix not in obj_org_email_suffix_list:
-        resp = {
-            "status": 1,
-            "error_msg": "해당 이메일은 해당 학교/단체 인증에 사용 가능한 이메일이 아닙니다."
-        }
-        return ViewReturn.fail(content=resp)
+            # Bad Request
+            if org_id_to_use is None or email_to_use is None:
+                return Response(
+                    ResponseContent.fail("Request에서 필요한 모든 정보를 제공하지 않았습니다."),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # 사용 중인 이메일
+            conflict_email_user = User.objects.filter(email=email_to_use).first()
+            if conflict_email_user is not None:
+                return Response(
+                    ResponseContent.fail(f"{email_to_use}는 사용 중입니다."),
+                    status=status.HTTP_409_CONFLICT
+                )
+            
+            obj_organization = Organization.objects.filter(id=org_id_to_use).first()
+            if obj_organization is None:
+                return Response(
+                    ResponseContent.fail(f"제공한 학교/단체 ID: {org_id_to_use}를 사용하는 학교/단체가 존재하지 않습니다."),
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            obj_email_suffix = '@' + email_to_use.split('@')[1]
+            obj_org_email_list = OrganizationEmail.objects.filter(organization=obj_organization).all()
+            suffix_list = [oe.suffix for oe in obj_org_email_list]
+            if obj_email_suffix not in suffix_list:
+                return Response(
+                    ResponseContent.fail(f"제공한 이메일: {email_to_use}는 학교/단체: {obj_organization.name}의 가입에 사용될 수 없습니다."),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-    import random
-    cur_auth_code = random.randint(100000, 999999)
-
-    send_result, reason = send_auth_email(email_address=email_to_use,
-                                          content=cur_auth_code)
-    if not send_result:
-        # TODO: 인증 메일 발송 실패 LOGGING
-        resp = {
-            "status": 1,
-            "error_msg": f"서버 오류! 인증 메일 발송 실패"
-        }
-        return ViewReturn.fail(content=resp)
-    
-    try:
-        with transaction.atomic(): # 민감한 data 삭제는 transaction control
-            email_auth_to_delete_list = EmailAuthentication.objects.filter(obj_email=email_to_use,
-                                                                           auth_type=EmailAuthentication.SIGNUP)
-            for email_to_delete in email_auth_to_delete_list:
-                email_to_delete.delete()
+            import random
+            cur_auth_code = str(random.randint(100000, 999999))
+            send_result, fail_reason = send_auth_email(email_address=email_to_use,
+                                                  content=cur_auth_code)
+            
+            if not send_result:
+                # TODO: 인증 메일 발송 실패 LOGGING
+                if fail_reason:
+                    raise Exception(fail_reason)
+                else:
+                    raise Exception("메일 발송 실패")
+            
+            try: # 인증 메일 발송 관련 DB 조작
+                with transaction.atomic():
+                    email_auth_to_delete_list = EmailAuthentication.objects.filter(obj_email=email_to_use,
+                                                                                   auth_type=EmailAuthentication.SIGNUP).all()
+                    for to_delete in email_auth_to_delete_list:
+                        to_delete.delete()
+                    
+                    cur_email_auth = EmailAuthentication(obj_email=email_to_use,
+                                                         auth_code=cur_auth_code,
+                                                         auth_type=EmailAuthentication.SIGNUP)
+                    cur_email_auth.save()
+            except:
+                # TODO: LOGGING
+                raise Exception("가입인증메일 관련 DB 조작 실패")
+            
+            return Response(
+                ResponseContent.success()
+            )
+        except Exception as e: # 서버 에러
+            # TODO: LOGGING using str(e)
+            return Response(
+                data=ResponseContent.fail("서버 에러!"),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
         
-            cur_email_auth = EmailAuthentication(obj_email=email_to_use,
-                                                 auth_code=cur_auth_code,
-                                                 auth_type=EmailAuthentication.SIGNUP)
-            cur_email_auth.save()
-    except Exception as e:
-        resp = {
-            "status": 1,
-            "error_mgs": "인증 메일 처리 중 DB 오류!"
-        }
-        return ViewReturn.fail(content=resp)
-
-    resp = {
-        "status": 0
-    }
-    return ViewReturn.success(content=resp)
-    
-
-def users_email_auth_confirm_view(request: HttpRequest):
+class users_email_auth_confirm_view(APIView):
     """
         Developer: Macchiato
         API: /users/organization/check_auth_code
         기능: 사용자가 frontend에 입력한 인증코드와 발송한 인증코드 대조
     """
-    request_data = json.loads(request.body)
-    email_to_check = request_data.get('email')
-    code_to_check = request_data.get('code')
+    def post(self, request):
+        try:
+            email_to_check = request.data.get('email')
+            code_to_check = request.data.get('code')
 
-    obj_EmailAuth = EmailAuthentication.objects.filter(obj_email=email_to_check,
+            # Bad Request
+            if email_to_check is None or code_to_check is None:
+                return Response(
+                    ResponseContent.fail("Request에서 필요한 모든 정보를 제공하지 않았습니다."),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            obj_EmailAuth = EmailAuthentication.objects.filter(obj_email=email_to_check,
                                                        auth_type=EmailAuthentication.SIGNUP).first()
-    if obj_EmailAuth is None:
-        resp = {
-            "status": 1,
-            "error_msg": f"잘못된 이메일: {email_to_check}, 해당 ID는 인증 요청을 발송하지 않았습니다."
-        }
-        return ViewReturn.fail(content=resp)
-    
-    if not obj_EmailAuth.check_auth_code(code_to_check):
-        resp = {
-            "status": 1,
-            "error_msg": f"잘못된 인증코드: {code_to_check}"
-        }
-        return ViewReturn.fail(content=resp)
-    
-    try: # 인증 완료
-        obj_EmailAuth.verified = True
-        obj_EmailAuth.save()
-        resp = {
-            "status": 0
-        }
-        return ViewReturn.success(content=resp)
-    except Exception as e:
-        resp = {
-            "status": 1,
-            "error_msg": "서버 오류!"
-        }
-        # TODO: LOGGING
-        return ViewReturn.fail(content=resp)
+            if obj_EmailAuth is None:
+                return Response(
+                    ResponseContent.fail(f"{email_to_check} 관련 인증 기록이 없습니다."),
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            if not obj_EmailAuth.check_auth_code(code_to_check):
+                return Response(
+                    ResponseContent.fail(f"{email_to_check}의 인증코드 {code_to_check}는 틀린 인증코드입니다."),
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
+            try: # 인증 완료
+                obj_EmailAuth.verified = True
+                obj_EmailAuth.save()
+            except:
+                # TODO: LOGGING
+                raise Exception("인증 완료 관련 DB 조작 실패")
+            
+            return Response(ResponseContent.success())
+        except Exception as e:
+            # TODO: LOGGING using str(e)
+            return Response(
+                data=ResponseContent.fail("서버 에러!"),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+class users_signup_view(APIView):
+    """
+        Developer: Macchiato
+        API: /users/signup
+        기능: 회원가입
+    """
+    def post(self, request):
+        try:
+            username_to_use = request.data.get('username')
+            password_to_use = request.data.get('password')
+            email_to_use = request.data.get('email')
+            organization_id_to_use = request.data.get('organization')
+
+            if User.objects.filter(username=username_to_use).exists():
+                return Response(
+                    data=ResponseContent.fail(f"해당 ID: {username_to_use}는 사용 중입니다."),
+                    status=status.HTTP_409_CONFLICT
+                )
+            
+            obj_org = Organization.objects.filter(id=organization_id_to_use).first()
+            if obj_org is None:
+                return Response(
+                    data=ResponseContent.fail(f"해당 ID: {organization_id_to_use}를 사용하는 학교/단체가 존재하지 않습니다."),
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            email_auth_to_check = EmailAuthentication.objects.filter(obj_email=email_to_use,
+                                                                     auth_type=EmailAuthentication.SIGNUP).first()
+            if email_auth_to_check is None:
+                return Response(
+                    data=ResponseContent.fail(f"해당 email: {email_to_use}의 인증 기록이 없습니다."),
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            if not email_auth_to_check.verified:
+                return Response(
+                    data=ResponseContent.fail(f"해당 email: {email_to_use}의 인증이 완료되지 않았습니다."),
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
+            try:
+                with transaction.atomic():
+                    email_auth_to_check.delete()
+                    new_user = User(
+                        username=username_to_use,
+                        password=password_to_use,
+                        email=email_to_use,
+                        organization=obj_org
+                    )
+                    new_user.save()
+            except:
+                # TODO: LOGGING
+                raise Exception("회원 가입 관련 DB 조작 실패") 
+
+            return Response(ResponseContent.success())
+        except Exception as e:
+            # TODO: LOGGING using str(e)
+            return Response(
+                data=ResponseContent.fail("서버 에러!"),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+class users_login_view(APIView):
+    """
+        Developer: 박시현
+        API: /users/login
+        기능: 로그인
+    """
+    def post(self, request):
+        try:
+            username_to_use = request.data.get('username')
+            password_to_use = request.data.get('password')
+
+            user = authenticate(username=username_to_use,
+                                password=password_to_use)
+            if user is None:
+                return Response(
+                    data=ResponseContent.fail(f"ID: {username_to_use} 또는 비밀번호 오류!"),
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
+            if not user.is_active:
+                return Response(
+                    data=ResponseContent.fail(f"ID: {username_to_use}는 비활성화 상태입니다."),
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
+            login(request, user)
+            # TODO: JWT Authentication?
+
+            return Response(data=ResponseContent.success())
+        except Exception as e:
+            # TODO: LOGGING using str(e)
+            return Response(
+                data=ResponseContent.fail("서버 에러!"),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+class users_reset_password_send_auth_email_view(APIView):
+    """
+        Developer: 
+        API: /users/reset-password/send_auth_email
+        기능: 가입 시 사용한 이메일을 받아 비밀번호 리셋용 인증 코드 전송
+    """
+    def post(self, request):
+        # TODO
+        raise NotImplementedError
