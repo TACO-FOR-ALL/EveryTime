@@ -37,6 +37,7 @@ class Organization(models.Model):
     # 선택사항:
     S_KOREA = 'KOR'
     CHINA = 'CHN'
+    OTHERS = 'OTH'
 
     region = models.CharField(
         max_length=16,
@@ -44,10 +45,25 @@ class Organization(models.Model):
         blank=False,
         choices={
             S_KOREA: "대한민국",
-            CHINA: "중국"
+            CHINA: "중국",
+            OTHERS: "기타"
         },
-        default=S_KOREA,
+        default=CHINA,
     )
+
+    @staticmethod
+    def get_default_organization():
+        """
+            시스템 관리에 필요한 default 학교/단체 생성 및 리턴.
+        """
+        return Organization.objects.get_or_create(name='SYSTEM',
+                                                  region=Organization.OTHERS)[0]
+
+    class Meta:
+        ordering=['created_at']
+        verbose_name='학교/단체'
+        verbose_name_plural='학교/단체들'
+
 
 class OrganizationEmail(models.Model):
     """
@@ -77,6 +93,11 @@ class OrganizationEmail(models.Model):
         blank=False,
         default='@example.com'
     )
+
+    class Meta:
+        ordering=['created_at']
+        verbose_name='학교/단체 인증용 이메일 주소'
+        verbose_name_plural='학교/단체 인증용 이메일 주소들'
 
 class EmailAuthentication(models.Model):
     """
@@ -142,6 +163,11 @@ class EmailAuthentication(models.Model):
             기능: 발송한 인증 코드와 대조하여, 일치할 시 True를 리턴
         """
         return self.auth_code == code_to_check
+    
+    class Meta:
+        ordering=['sent_at']
+        verbose_name='가입 인증 메일 발송 기록'
+        verbose_name_plural='가입 인증 메일 발송 기록들'
 
 
 class User(AbstractUser):
@@ -152,7 +178,8 @@ class User(AbstractUser):
     # 소속 단체
     organization = models.ForeignKey(
         Organization,
-        on_delete=models.PROTECT
+        on_delete=models.PROTECT,
+        default=Organization.get_default_organization
         # 단체/학교 삭제 시, 만약 해당 단체/학교 소속 유저가 있을 경우 오류 raise
     )
 
@@ -167,3 +194,8 @@ class User(AbstractUser):
         """
         readable = localtime(self.signup_at).strftime('%Y-%m-%d %H:%M:%S')
         return readable
+    
+    class Meta:
+        ordering=['signup_at']
+        verbose_name='유저'
+        verbose_name_plural='유저들'
