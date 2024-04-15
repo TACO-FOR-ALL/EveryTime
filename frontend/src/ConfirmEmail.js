@@ -12,7 +12,8 @@ function ConfirmEmail() {
 
     useEffect(() => {
         // 가입 가능한 학교/단체 리스트를 불러오는 API 호출
-        fetch('/users/organization/list')
+        //fetch('/users/organization/list')
+        fetch(`${process.env.REACT_APP_BACKEND_HOST}/api/users/organization/list`)
             .then(response => response.json())
             .then(data => {
                 if (data.status === 0) {
@@ -28,7 +29,8 @@ function ConfirmEmail() {
         const selectedId = event.target.value;
         setSelectedOrgId(selectedId);
         // 선택한 학교/단체에 해당하는 이메일 접미사를 불러오는 API 호출
-        fetch(`/users/organization/emails`, {
+        //fetch(`/users/organization/emails`, {
+        fetch(`${process.env.REACT_APP_BACKEND_HOST}/api/users/organization/emails`,{
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ org_id: selectedId })
@@ -51,7 +53,8 @@ function ConfirmEmail() {
         }
         const fullEmail = email + emailSuffix;
         // 인증 메일 발송 요청 API 호출
-        fetch('/users/organization/send_auth_email', {
+        //fetch('/users/organization/send_auth_email', {
+        fetch(`${process.env.REACT_APP_BACKEND_HOST}/api/users/organization/send_auth_email`,{
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
