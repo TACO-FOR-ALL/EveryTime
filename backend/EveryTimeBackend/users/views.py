@@ -1,14 +1,43 @@
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenRefreshView
 from django.db import transaction
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate
 from .models import *
 from .serializers import *
 from .utils import *
 
 from EveryTimeBackend.utils import ResponseContent
 
+# class ProtectedTestView(APIView):
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request):
+#         return Response('Get is good!')
+#     def post(self, request):
+#         msg = request.data.get('msg')
+#         return Response(f'Post got the msg: {msg}')
+    
+class CustomTokenRefreshView(TokenRefreshView):
+    """
+        Developer: Macchiato
+        API: /users/refresh-access-token
+        기능: 가입 가능 학교/단체 리스트 제공
+    """
+    def post(self, request, *args, **kwargs):
+        original_response = super().post(request, *args, **kwargs)
+        if original_response.status_code != 200:
+            # TODO: LOGGING using original_response.data
+            return Response(data=ResponseContent.fail(error_msg='JWT 토큰 갱신 실패!'),
+                            status=original_response.status_code)
+        else:
+            return Response(data=ResponseContent.success(data=original_response.data['access'],
+                                                         data_field_name='access'),
+                            status=original_response.status_code)
+        
 class users_organization_list_view(APIView):
     """
         Developer: Macchiato
@@ -141,6 +170,7 @@ class users_organization_send_auth_email_view(APIView):
             )
         except Exception as e: # 서버 에러
             # TODO: LOGGING using str(e)
+            print(str(e))
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -237,10 +267,10 @@ class users_signup_view(APIView):
                     email_auth_to_check.delete()
                     new_user = User(
                         username=username_to_use,
-                        password=password_to_use,
                         email=email_to_use,
                         organization=obj_org
                     )
+                    new_user.set_password(password_to_use)
                     new_user.save()
             except:
                 # TODO: LOGGING
@@ -258,7 +288,7 @@ class users_login_view(APIView):
     """
         Developer: 박시현
         API: /users/login
-        기능: 로그인
+        기능: 로그인, JWT인증 중 TokenObtainPairView의 역할을 함.
     """
     def post(self, request):
         try:
@@ -267,6 +297,7 @@ class users_login_view(APIView):
 
             user = authenticate(username=username_to_use,
                                 password=password_to_use)
+            # TODO: AUTHENTICATION 불가?
             if user is None:
                 return Response(
                     data=ResponseContent.fail(f"ID: {username_to_use} 또는 비밀번호 오류!"),
@@ -279,10 +310,17 @@ class users_login_view(APIView):
                     status=status.HTTP_401_UNAUTHORIZED
                 )
             
-            login(request, user)
-            # TODO: JWT Authentication?
-
-            return Response(data=ResponseContent.success())
+            # jwt token
+            refresh = RefreshToken.for_user(user)
+            return Response(
+                data=ResponseContent.success(
+                    data={
+                        'refresh': str(refresh),
+                        'access': str(refresh.access_token)
+                    },
+                    data_field_name='tokens'
+                )
+            )
         except Exception as e:
             # TODO: LOGGING using str(e)
             return Response(

@@ -1,5 +1,4 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 from .models import *
 
 # Register your models here.
@@ -27,6 +26,11 @@ class UserAdmin(admin.ModelAdmin):
     def get_organization_name(self, obj):
         return obj.organization.name
     get_organization_name.short_description = 'Organization Name'
+
+    def save_model(self, request, obj, form, change):
+        if 'password' in form.changed_data:
+            obj.set_password(obj.password)  # 加密密码
+        super().save_model(request, obj, form, change)
 
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(OrganizationEmail, OrganizationEmailAdmin)
