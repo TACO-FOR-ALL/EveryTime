@@ -7,6 +7,10 @@ from . import views
     URL prefix: /users/
 """
 urlpatterns = [
+#     path("test",
+#          views.ProtectedTestView.as_view(),
+#          name='users.test'),
+
     path("signup", # 회원가입
          views.users_signup_view.as_view(), 
          name='users.signup'), 
@@ -16,7 +20,7 @@ urlpatterns = [
          name='users.login'),
 
      path("refresh-access-token", # JWT access token 리프레시
-          TokenRefreshView.as_view(),
+          views.CustomTokenRefreshView.as_view(),
           name='users.refresh_access_token'),
 
      path("reset-password/send_auth_email",  # 비밀번호 리셋용 인증 메일 발송

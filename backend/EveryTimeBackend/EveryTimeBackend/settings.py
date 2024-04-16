@@ -123,12 +123,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 """
     Django contrib.auth.models의 User를 기준으로 확장한 User 모델을 사용
 """
-AUTH_USER_MODEL = 'users.user'
+AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication', # jwt인증
     ],
+    'EXCEPTION_HANDLER': 'users.exception_handler.custom_exception_handler',
 }
 
 from datetime import timedelta

@@ -64,6 +64,9 @@ class Organization(models.Model):
         verbose_name='학교/단체'
         verbose_name_plural='학교/단체들'
 
+    def __str__(self):
+        return self.region + '-' + self.name
+
 class OrganizationEmail(models.Model):
     """
         학교/단체 인증용 이메일
@@ -197,3 +200,6 @@ class User(AbstractUser):
         ordering=['signup_at']
         verbose_name='유저'
         verbose_name_plural='유저들'
+
+    def __str__(self):
+        return self.organization.region + '-' + self.organization.name + '-' + self.username
