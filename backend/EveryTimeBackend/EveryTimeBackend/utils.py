@@ -1,3 +1,11 @@
+def generate_auth_code() -> str:
+    """
+        Developer: 박찬빈
+        기능: 100000~999999 사이의 랜덤 숫자를 str의 형식으로 리턴
+    """
+    import random
+    return str(random.randint(100000, 999999))
+
 class ResponseContent(object):
     """
         Developer: 박찬빈

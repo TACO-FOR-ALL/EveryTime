@@ -10,7 +10,7 @@ from .models import *
 from .serializers import *
 from .utils import *
 
-from EveryTimeBackend.utils import ResponseContent
+from EveryTimeBackend.utils import ResponseContent, generate_auth_code
 
 # class ProtectedTestView(APIView):
 #     permission_classes = [IsAuthenticated]
@@ -138,10 +138,11 @@ class users_organization_send_auth_email_view(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
-            import random
-            cur_auth_code = str(random.randint(100000, 999999))
+            # 메일 발송
+            cur_auth_code = generate_auth_code()
             send_result, fail_reason = send_auth_email(email_address=email_to_use,
-                                                  content=cur_auth_code)
+                                                       content=cur_auth_code,
+                                                       type=1)
             
             if not send_result:
                 # TODO: 인증 메일 발송 실패 LOGGING
@@ -176,7 +177,7 @@ class users_organization_send_auth_email_view(APIView):
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
         
-class users_email_auth_confirm_view(APIView):
+class users_organization_check_auth_code_view(APIView):
     """
         Developer: Macchiato
         API: /users/organization/check_auth_code
@@ -330,10 +331,163 @@ class users_login_view(APIView):
         
 class users_reset_password_send_auth_email_view(APIView):
     """
-        Developer: 
+        Developer: Macchiato
         API: /users/reset-password/send_auth_email
         기능: 가입 시 사용한 이메일을 받아 비밀번호 리셋용 인증 코드 전송
     """
     def post(self, request):
-        # TODO
-        raise NotImplementedError
+        try:
+            email_to_use = request.data.get('email')
+
+            # Bad Request
+            if email_to_use is None:
+                return Response(
+                    ResponseContent.fail("Request에서 필요한 모든 정보를 제공하지 않았습니다."),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # 인증 유저 검색
+            email_user = User.objects.filter(email=email_to_use).first()
+            if email_user is not None:
+                return Response(
+                    ResponseContent.fail(f"{email_to_use}을 사용하는 유저가 존재하지 않습니다."),
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            cur_auth_code = generate_auth_code()
+            send_result, fail_reason = send_auth_email(email_address=email_to_use,
+                                                       content=cur_auth_code,
+                                                       type=2)
+            
+            if not send_result:
+                # TODO: 인증 메일 발송 실패 LOGGING
+                if fail_reason:
+                    raise Exception(fail_reason)
+                else:
+                    raise Exception("메일 발송 실패")
+                
+            try: # 인증 메일 발송 관련 DB 조작
+                with transaction.atomic():
+                    email_auth_to_delete_list = EmailAuthentication.objects.filter(obj_email=email_to_use,
+                                                                                   auth_type=EmailAuthentication.PWRESET).all()
+                    for to_delete in email_auth_to_delete_list:
+                        to_delete.delete()
+                    
+                    cur_email_auth = EmailAuthentication(obj_email=email_to_use,
+                                                         auth_code=cur_auth_code,
+                                                         auth_type=EmailAuthentication.PWRESET)
+                    cur_email_auth.save()
+            except:
+                # TODO: LOGGING
+                raise Exception("가입인증메일 관련 DB 조작 실패")
+            
+            return Response(ResponseContent.success())
+        except:
+            # TODO: LOGGING using str(e)
+            return Response(
+                data=ResponseContent.fail("서버 에러!"),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+class users_reset_password_check_auth_code_view(APIView):
+    """
+        Developer: Macchiato
+        API: /users/reset-password/send_auth_email
+        기능: 가입 시 사용한 이메일을 받아 비밀번호 리셋용 인증 코드 전송
+    """
+    def post(self, request):
+        try:
+            email_to_check = request.data.get('email')
+            code_to_check = request.data.get('code')
+            
+            # Bad Request
+            if email_to_check is None or code_to_check is None:
+                return Response(
+                    ResponseContent.fail("Request에서 필요한 모든 정보를 제공하지 않았습니다."),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            obj_EmailAuth = EmailAuthentication.objects.filter(obj_email=email_to_check,
+                                                       auth_type=EmailAuthentication.PWRESET).first()
+            if obj_EmailAuth is None:
+                return Response(
+                    ResponseContent.fail(f"{email_to_check} 관련 인증 기록이 없습니다."),
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            if not obj_EmailAuth.check_auth_code(code_to_check):
+                return Response(
+                    ResponseContent.fail(f"{email_to_check}의 인증코드 {code_to_check}는 틀린 인증코드입니다."),
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
+            try: # 인증 완료
+                obj_EmailAuth.verified = True
+                obj_EmailAuth.save()
+            except:
+                # TODO: LOGGING
+                raise Exception("인증 완료 관련 DB 조작 실패")
+            
+            return Response(ResponseContent.success())
+
+        except:
+            # TODO: LOGGING using str(e)
+            return Response(
+                data=ResponseContent.fail("서버 에러!"),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+class users_reset_password_set_password_view(APIView):
+    """
+        Developer: Macchiato
+        API: /users/reset-password/send_auth_email
+        기능: 가입 시 사용한 이메일을 받아 비밀번호 리셋용 인증 코드 전송
+    """
+    def post(self, request):
+        try:
+            email_to_use = request.data.get('email')
+            password_to_use = request.data.get('password')
+
+            # Bad Request
+            if email_to_use is None or password_to_use is None:
+                return Response(
+                    ResponseContent.fail("Request에서 필요한 모든 정보를 제공하지 않았습니다."),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            user_to_use = User.objects.filter(email=email_to_use).first()
+            if user_to_use is None:
+                return Response(
+                    data=ResponseContent.fail(f"{email_to_use}를 사용하는 유저는 존재하지 않습니다."),
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            email_auth_to_check = EmailAuthentication.objects.filter(obj_email=email_to_use,
+                                                                     auth_type=EmailAuthentication.PWRESET).first()
+            if email_auth_to_check is None:
+                return Response(
+                    data=ResponseContent.fail(f"해당 email: {email_to_use}의 인증 기록이 없습니다."),
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            if not email_auth_to_check.verified:
+                return Response(
+                    data=ResponseContent.fail(f"해당 email: {email_to_use}의 인증이 완료되지 않았습니다."),
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
+            try:
+                with transaction.atomic():
+                    email_auth_to_check.delete()
+                    user_to_use.set_password(password_to_use)
+                    user_to_use.save()
+            except:
+                # TODO: LOGGING
+                raise Exception("비밀번호 변경 관련 DB 조작 실패") 
+
+            return Response(ResponseContent.success())
+            
+        except:
+            return Response(
+                data=ResponseContent.fail("서버 에러!"),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
