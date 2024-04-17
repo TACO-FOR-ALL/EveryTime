@@ -202,6 +202,12 @@ class users_email_auth_confirm_view(APIView):
                     status=status.HTTP_404_NOT_FOUND
                 )
             
+            if not obj_EmailAuth.is_valid():
+                return Response(
+                    ResponseContent.fail(f"{email_to_check}의 인증 코드가 만료되었습니다."),
+                    status=status.HTTP_401_UNAUTHORIZED
+                )
+            
             if not obj_EmailAuth.check_auth_code(code_to_check):
                 return Response(
                     ResponseContent.fail(f"{email_to_check}의 인증코드 {code_to_check}는 틀린 인증코드입니다."),
