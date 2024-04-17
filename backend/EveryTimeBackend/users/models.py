@@ -3,7 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.utils.timezone import localtime
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 # Create your models here.
 
 class Organization(models.Model):
@@ -166,6 +166,25 @@ class EmailAuthentication(models.Model):
         """
         return self.auth_code == code_to_check
     
+    def is_valid(self, valid_time: int=15):
+        """
+            기능: 발송 후 경과한 시간에 따라 여전히 유효한 인증 기록인지 리턴.
+            설명: 유효 기간은 기본 15분이며, call 시 valid_time 설정에 따라 조절 가능
+        """
+        now = datetime.now(self.sent_at.tzinfo)
+        if now > self.sent_at:
+            time_diff = now - self.sent_at
+            return time_diff <= timedelta(minutes=valid_time)
+        else:
+            return False
+    
+    def get_readable_sent_at(self):
+        """
+            기능: sent_at 필드를 가독성이 좋은 포맷으로 리턴
+        """
+        readable = localtime(self.sent_at).strftime('%Y-%m-%d %H:%M:%S')
+        return readable
+    
     class Meta:
         ordering=['sent_at']
         verbose_name='가입 인증 메일 발송 기록'
@@ -191,7 +210,7 @@ class User(AbstractUser):
 
     def get_readable_signup_at(self):
         """
-            signup_at 필드를 가독성이 좋은 포맷으로 리턴
+            기능: signup_at 필드를 가독성이 좋은 포맷으로 리턴
         """
         readable = localtime(self.signup_at).strftime('%Y-%m-%d %H:%M:%S')
         return readable
