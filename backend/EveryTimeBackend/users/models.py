@@ -2,36 +2,12 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.timezone import localtime
 
-import uuid
 from datetime import datetime, timedelta
-# Create your models here.
 
-class Organization(models.Model):
+class Region(models.Model):
     """
-        학교/단체 관련 정보를 저장하는 모델.
-        명칭/지역을 필수적으로 제공해야 함.
+        국가/지역 모델
     """
-    # 고유 식별 id
-    id = models.UUIDField(
-        primary_key=True,
-        editable=False,
-        default=uuid.uuid4
-    )
-
-    # 명칭
-    name = models.CharField(
-        max_length=255,
-        null=False,
-        blank=False,
-        unique=True,
-        default=''
-    )
-
-    # 등록 시간
-    created_at = models.DateTimeField(
-        auto_now_add=True
-    )
-
     # 지역 (국가)
     # 먼저 선택사항들을 정의하고 아래 choices에 등록
     # 선택사항:
@@ -39,7 +15,7 @@ class Organization(models.Model):
     CHINA = 'CHN'
     OTHERS = 'OTH'
 
-    region = models.CharField(
+    name=models.CharField(
         max_length=16,
         null=False,
         blank=False,
@@ -48,16 +24,41 @@ class Organization(models.Model):
             CHINA: "중국",
             OTHERS: "기타"
         },
-        default=CHINA,
+        default=OTHERS,
+    )
+    
+    class Meta:
+        ordering=['name']
+        verbose_name='지역'
+        verbose_name_plural='지역들'
+
+    def __str__(self):
+        return f'{self.name}'
+
+class Organization(models.Model):
+    """
+        학교/단체 관련 정보를 저장하는 모델.
+        명칭/지역을 필수적으로 제공해야 함.
+    """
+    # 명칭
+    name = models.CharField(
+        max_length=255,
+        null=False,
+        blank=False,
+        unique=True,
+        default='SYSTEM'
     )
 
-    @staticmethod
-    def get_default_organization():
-        """
-            시스템 관리에 필요한 default 학교/단체 생성 및 리턴.
-        """
-        return Organization.objects.get_or_create(name='SYSTEM',
-                                                  region=Organization.OTHERS)[0]
+    # 등록 시간
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    # 지역
+    region = models.ForeignKey(
+        Region,
+        on_delete=models.PROTECT,
+    )
 
     class Meta:
         ordering=['created_at']
@@ -65,7 +66,38 @@ class Organization(models.Model):
         verbose_name_plural='학교/단체들'
 
     def __str__(self):
-        return self.region + '-' + self.name
+        return f'{self.region.name}-{self.name}'
+    
+class Club(models.Model):
+    """
+        동아리 모델
+    """
+    name = models.CharField(
+        max_length=255,
+        null=False,
+        blank=False,
+        unique=True,
+        default='SYSTEM'
+    )
+
+    # 등록 시간
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    # 지역
+    region = models.ForeignKey(
+        Region,
+        on_delete=models.PROTECT,
+    )
+
+    class Meta:
+        ordering=['created_at']
+        verbose_name='동아리'
+        verbose_name_plural='동아리들'
+
+    def __str__(self):
+        return f'{self.region.name}-{self.name}'
 
 class OrganizationEmail(models.Model):
     """
@@ -199,7 +231,9 @@ class User(AbstractUser):
     organization = models.ForeignKey(
         Organization,
         on_delete=models.PROTECT,
-        default=Organization.get_default_organization
+        null=True,
+        blank=True,
+        default=None
         # 단체/학교 삭제 시, 만약 해당 단체/학교 소속 유저가 있을 경우 오류 raise
     )
 
@@ -221,4 +255,7 @@ class User(AbstractUser):
         verbose_name_plural='유저들'
 
     def __str__(self):
-        return self.organization.region + '-' + self.organization.name + '-' + self.username
+        if self.organization:
+            return self.organization.region.name + '-' + self.organization.name + '-' + self.username
+        else:
+            return self.username
