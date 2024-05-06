@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework', # DRF
     'users', # 유저 관리 app
+    'posts', # 게시글 app
 ]
 
 MIDDLEWARE = [

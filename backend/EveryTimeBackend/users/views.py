@@ -11,15 +11,6 @@ from .serializers import *
 from .utils import *
 
 from EveryTimeBackend.utils import ResponseContent, generate_auth_code
-
-# class ProtectedTestView(APIView):
-#     permission_classes = [IsAuthenticated]
-
-#     def get(self, request):
-#         return Response('Get is good!')
-#     def post(self, request):
-#         msg = request.data.get('msg')
-#         return Response(f'Post got the msg: {msg}')
     
 class CustomTokenRefreshView(TokenRefreshView):
     """
@@ -497,3 +488,15 @@ class users_reset_password_set_password_view(APIView):
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+
+class users_profile_view(APIView):
+    """
+        Developer: 
+        API: /users/profile
+        기능: 요청을 보낸 유저의 프로필 사진을 다운로드할 수 있는 url 리턴
+    """
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        raise NotImplementedError
+        # TODO
