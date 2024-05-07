@@ -42,6 +42,8 @@ INSTALLED_APPS = [
     'rest_framework', # DRF
     'users', # 유저 관리 app
     'posts', # 게시글 app
+    'boards', # 게시판 app
+    'comments', # 댓글 app
 ]
 
 MIDDLEWARE = [
