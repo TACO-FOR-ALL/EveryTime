@@ -10,20 +10,20 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('boards', '0002_initial'),
+        ('comments', '0001_initial'),
         ('posts', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='post',
+            model_name='comment',
             name='author',
             field=models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL),
         ),
         migrations.AddField(
-            model_name='post',
-            name='board',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, to='boards.baseboard'),
+            model_name='comment',
+            name='post',
+            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='posts.post'),
         ),
     ]

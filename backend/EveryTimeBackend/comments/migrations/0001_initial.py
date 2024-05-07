@@ -12,19 +12,11 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='Post',
+            name='Comment',
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('title', models.CharField(default='SYSTEM', max_length=255)),
-                ('content', models.TextField()),
-                ('profile', models.URLField(default='SYSTEM')),
                 ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('last_modified', models.DateTimeField(auto_now=True)),
+                ('content', models.TextField(max_length=1024)),
             ],
-            options={
-                'verbose_name': '게시글',
-                'verbose_name_plural': '게시글들',
-                'ordering': ['created_at'],
-            },
         ),
     ]

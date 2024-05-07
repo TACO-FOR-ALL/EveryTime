@@ -36,7 +36,7 @@ class PostAdmin(admin.ModelAdmin):
     get_author_name.short_description = 'Author Username'
 
     def get_board_name(self, obj):
-        return obj.organization.name
+        return obj.board.name
     get_board_name.short_description = 'Board Name'
 
 #admin.site.register(Board, BoardAdmin)

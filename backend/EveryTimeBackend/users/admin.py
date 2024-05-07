@@ -11,6 +11,20 @@ class RegionAdmin(admin.ModelAdmin):
         'name'
     ]
 
+class ClubAdmin(admin.ModelAdmin):
+    list_display = [
+        'name',
+        'get_region_name',
+        'created_at'
+    ]
+    search_fields = [
+        'name',
+        'region__name'
+    ]
+
+    def get_region_name(self, obj):
+        return obj.region.name
+
 class OrganizationAdmin(admin.ModelAdmin):
     list_display = [
         'name',
@@ -77,6 +91,7 @@ class UserAdmin(admin.ModelAdmin):
         super().save_model(request, obj, form, change)
 
 admin.site.register(Region, RegionAdmin)
+admin.site.register(Club, ClubAdmin)
 admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(OrganizationEmail, OrganizationEmailAdmin)
 admin.site.register(EmailAuthentication, EmailAuthenticationAdmin)

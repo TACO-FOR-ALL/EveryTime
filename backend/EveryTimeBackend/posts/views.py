@@ -6,31 +6,6 @@ from rest_framework import status
 from .models import *
 from EveryTimeBackend.utils import ResponseContent
 
-
-class posts_main_board_view(APIView):
-    """
-        Developer: 
-        API: /posts/main_board
-        기능: 요청을 보낸 유저가 등록한 메인 게시판 관련 정보 리턴
-    """
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        raise NotImplementedError
-        # TODO
-
-class posts_bookmark_boards_view(APIView):
-    """
-        Developer: 
-        API: /posts/bookmark_boards
-        기능: 요청을 보낸 유저가 즐겨찾기한 게시판 관련 정보 리턴
-    """
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        raise NotImplementedError
-        # TODO
-
 class posts_get_realtime_best_view(APIView):
     """
         Developer: 
