@@ -38,6 +38,7 @@ class UserBoardProfileAdmin(admin.ModelAdmin):
 class RegionBoardAdmin(admin.ModelAdmin):
     list_display = [
         'name',
+        'is_public',
         'get_region_name',
         'created_at'
     ]
@@ -53,6 +54,7 @@ class RegionBoardAdmin(admin.ModelAdmin):
 class OrganizationBoardAdmin(admin.ModelAdmin):
     list_display = [
         'name',
+        'is_public',
         'get_region_name',
         'get_organization_name',
         'created_at'
@@ -74,6 +76,7 @@ class OrganizationBoardAdmin(admin.ModelAdmin):
 class ClubBoardAdmin(admin.ModelAdmin):
     list_display = [
         'name',
+        'is_public',
         'get_region_name',
         'get_club_name',
         'created_at'

@@ -21,9 +21,15 @@ class BaseBoard(models.Model):
         auto_now_add=True
     )
 
+    # 지역
     region=models.ForeignKey(
         Region,
         on_delete=models.PROTECT, # 지역 관련 게시판 존재 시 에러
+    )
+
+    # 전체 공개 여부
+    is_public=models.BooleanField(
+        default=False
     )
     
     class Meta:
