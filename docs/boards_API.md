@@ -19,13 +19,15 @@ None
 
 ```json
 {
-    "board_name": "string",
-    "board_id": "string"
+    "main_board":{
+        "board_name": "string",
+        "board_id": "string"
+    }
 }
 ```
 |이름|타입|설명|
 | - | - | - |
-|borad_name|string|메인 게시판 이름|
+|borad_name|string|메인 게시판 이름(설정된 메인 게시판이 없을 경우 빈 값)|
 |board_id|string|메인 게시판 id|
 
 ## 즐겨찾는게시판요청
