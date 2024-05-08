@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from users.models import User
 from posts.models import Post
@@ -41,3 +43,28 @@ class Comment(models.Model):
     def __str__(self):
         if self.author:
             return f'{self.author.username}-{self.post.title}'
+        
+class UserCommentProfile(models.Model):
+    """
+        유저 관련 기타 정보 저장
+    """
+    # 관련 유저
+    user=models.OneToOneField(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    # 유저가 작성한 댓글
+    comments=models.ManyToManyField(
+        Comment
+    )
+
+# User모델 생성 시, UserCommentProfile 자동 생성
+@receiver(post_save, sender=User)
+def create_user_comment_profile(sender, instance, created, **kwargs):
+    if created:
+        UserCommentProfile.objects.create(user=instance)
+# User모델 저장 시, 관련 UserCommentProfile 자동 저장
+@receiver(post_save, sender=User)
+def save_user_comment_profile(sender, instance, **kwargs):
+    instance.usercommentprofile.save()

@@ -1,5 +1,7 @@
 from django.db import models
 from django.utils.timezone import localtime
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 from users.models import User
 from boards.models import BaseBoard
@@ -58,3 +60,28 @@ class Post(models.Model):
 
     def __str__(self):
         return f'{self.board.name}-{self.title}-{localtime(self.created_at).strftime('%Y-%m-%d %H:%M:%S')}'
+    
+class UserPostProfile(models.Model):
+    """
+        유저 관련 기타 정보 저장
+    """
+    # 관련 유저
+    user=models.OneToOneField(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    # 유저가 작성한 게시글
+    posts=models.ManyToManyField(
+        Post
+    )
+
+# User모델 생성 시, UserPostProfile 자동 생성
+@receiver(post_save, sender=User)
+def create_user_post_profile(sender, instance, created, **kwargs):
+    if created:
+        UserPostProfile.objects.create(user=instance)
+# User모델 저장 시, 관련 UserPostProfile 자동 저장
+@receiver(post_save, sender=User)
+def save_user_post_profile(sender, instance, **kwargs):
+    instance.userpostprofile.save()
