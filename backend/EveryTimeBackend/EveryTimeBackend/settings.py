@@ -132,7 +132,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication', # jwt인증
     ],
-    'EXCEPTION_HANDLER': 'users.exception_handler.custom_exception_handler',
+    'EXCEPTION_HANDLER': 'everytimebackend.exception_handler.custom_exception_handler',
 }
 
 from datetime import timedelta

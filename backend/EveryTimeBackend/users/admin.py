@@ -1,7 +1,31 @@
 from django.contrib import admin
 from .models import *
 
-# Register your models here.
+
+class UserProfileAdmin(admin.ModelAdmin):
+    list_display = [
+        'get_user_username',
+        'get_clubs'
+    ]
+    search_fields = [
+        'user__username',
+        'clubs__name'
+    ]
+
+    def get_user_username(self, obj):
+        return obj.user.username
+    get_user_username.short_description = 'User username'
+
+    def get_clubs(self, obj):
+        return ','.join([club.name 
+                         for club in obj.clubs.all()])
+    get_clubs.short_description = 'Clubs name'
+
+    def save_model(self, request, obj, form, change):
+        if not obj.clubs.exists(): # 즐겨찾기 게시판 미지정
+            obj.clubs.clear()
+        
+        super().save_model(request, obj, form, change)
 
 class RegionAdmin(admin.ModelAdmin):
     list_display = [
@@ -96,3 +120,4 @@ admin.site.register(Organization, OrganizationAdmin)
 admin.site.register(OrganizationEmail, OrganizationEmailAdmin)
 admin.site.register(EmailAuthentication, EmailAuthenticationAdmin)
 admin.site.register(User, UserAdmin)
+admin.site.register(UserProfile, UserProfileAdmin)
