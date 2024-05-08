@@ -242,6 +242,12 @@ class User(AbstractUser):
         auto_now_add=True
     )
 
+    # 프로필 다운 url
+    profile = models.URLField(
+        blank=True,
+        default=''
+    )
+
     def get_readable_signup_at(self):
         """
             기능: signup_at 필드를 가독성이 좋은 포맷으로 리턴

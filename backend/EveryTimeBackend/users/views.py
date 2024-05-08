@@ -492,10 +492,22 @@ class users_reset_password_set_password_view(APIView):
 
 class users_profile_view(LoginNeededView):
     """
-        Developer: 
+        Developer: Macchiato
         API: /users/profile
         기능: 요청을 보낸 유저의 프로필 사진을 다운로드할 수 있는 url 리턴
     """
     def get(self, request):
-        raise NotImplementedError
-        # TODO
+        user=self.get_user()
+        try:
+            return Response(
+                data=ResponseContent.success(
+                    data=user.profile,
+                    data_field_name='url'
+                )
+            )
+        except:
+            # TODO: LOGGING
+            return Response(
+                data=ResponseContent.fail("서버 에러!"),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
