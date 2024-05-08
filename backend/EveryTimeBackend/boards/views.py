@@ -6,10 +6,10 @@ from .models import *
 from EveryTimeBackend.view_template import LoginNeededView
 from EveryTimeBackend.utils import ResponseContent
 
-class boards_main_board_view(LoginNeededView):
+class boards_get_main_board_view(LoginNeededView):
     """
         Developer: Macchiato
-        API: /boards/main_board
+        API: /boards/get/main_board
         기능: 요청을 보낸 유저가 등록한 메인 게시판 관련 정보 리턴
     """
 
@@ -40,10 +40,10 @@ class boards_main_board_view(LoginNeededView):
             )
 
 
-class boards_bookmark_boards_view(LoginNeededView):
+class boards_get_bookmark_boards_view(LoginNeededView):
     """
         Developer: Macchiato
-        API: /boards/bookmark_boards
+        API: /boards/get/bookmark_boards
         기능: 요청을 보낸 유저가 즐겨찾기한 게시판 관련 정보 리턴
     """
 
@@ -73,3 +73,23 @@ class boards_bookmark_boards_view(LoginNeededView):
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+class boards_set_main_board_view(LoginNeededView):
+    """
+        Developer: 
+        API: /boards/set/main_board
+        기능: 유저의 메인 게시판에 대한 조작
+    """
+    def post(self, request):
+        # TODO
+        raise NotImplementedError
+
+class boards_set_bookmark_boards_view(LoginNeededView):
+    """
+        Developer: 
+        API: /boards/set/bookmark_boards
+        기능: 유저의 즐겨찾기 게시판에 대한 조작
+    """
+    def post(self, request):
+        # TODO
+        raise NotImplementedError

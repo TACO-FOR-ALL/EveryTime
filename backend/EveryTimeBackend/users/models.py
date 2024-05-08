@@ -1,4 +1,6 @@
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.contrib.auth.models import AbstractUser
 from django.utils.timezone import localtime
 
@@ -265,3 +267,41 @@ class User(AbstractUser):
             return self.organization.region.name + '-' + self.organization.name + '-' + self.username
         else:
             return self.username
+        
+class UserProfile(models.Model):
+    """
+        유저 관련 기타 정보 저장:
+        1. 소속 동아리
+    """
+    # 관련 유저
+    user=models.OneToOneField(
+        User,
+        on_delete=models.CASCADE
+    )
+
+    clubs=models.ManyToManyField(
+        Club
+    )
+
+    class Meta:
+        ordering=['user__username']
+        verbose_name='유저의 동아리 관련 정보'
+        verbose_name_plural='유저의 동아리 관련 정보들'
+
+    def __str__(self):
+        clubs = ','.join([club.name for club in self.clubs.all()])
+            
+        return f"""
+        {self.user.username}
+        -{clubs}
+        """
+    
+# User모델 생성 시, UserBoardProfile 자동 생성
+@receiver(post_save, sender=User)
+def create_user_board_profile(sender, instance, created, **kwargs):
+    if created:
+        UserProfile.objects.create(user=instance)
+# User모델 저장 시, 관련 UserBoardProfile 자동 저장
+@receiver(post_save, sender=User)
+def save_user_board_profile(sender, instance, **kwargs):
+    instance.userprofile.save()

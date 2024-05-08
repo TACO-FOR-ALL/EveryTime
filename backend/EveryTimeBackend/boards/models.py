@@ -27,7 +27,7 @@ class BaseBoard(models.Model):
         on_delete=models.PROTECT, # 지역 관련 게시판 존재 시 에러
     )
 
-    # 전체 공개 여부
+    # 전체 공개
     is_public=models.BooleanField(
         default=False
     )
@@ -51,7 +51,10 @@ class RegionBoard(BaseBoard):
         verbose_name_plural='지역 게시판들'
 
     def __str__(self):
-        return f'{self.region.name}-{self.name}'
+        if self.is_public:
+            return f'{self.region.name}-{self.name}-전체 공개'
+        else:
+            return f'{self.region.name}-{self.name}-전체 비공개'
 
 class OrganizationBoard(BaseBoard):
     """
@@ -62,13 +65,20 @@ class OrganizationBoard(BaseBoard):
         on_delete=models.PROTECT,
     )
 
+    # 같은 지역의 유저에게 공개
+    is_public_to_region=models.BooleanField(
+        default=False
+    )
+
     class Meta:
         ordering=['created_at']
         verbose_name='학교/단체 게시판'
         verbose_name_plural='학교/단체 게시판들'
 
     def __str__(self):
-        return f'{self.organization.name}-{self.name}'
+        all_pub = '전체 공개' if self.is_public else '전체 비공개'
+        region_pub = '지역 공개' if self.is_public_to_region else '지역 비공개'
+        return f'{self.organization.name}-{self.name}-{all_pub}-{region_pub}'
 
 class ClubBoard(BaseBoard):
     """
@@ -79,17 +89,26 @@ class ClubBoard(BaseBoard):
         on_delete=models.PROTECT,
     )
 
+    # 같은 지역의 유저에게 공개
+    is_public_to_region=models.BooleanField(
+        default=False
+    )
+
     class Meta:
         ordering=['created_at']
         verbose_name='동아리 게시판'
         verbose_name_plural='동아리 게시판들'
 
     def __str__(self):
-        return f'{self.club.name}-{self.name}'
+        all_pub = '전체 공개' if self.is_public else '전체 비공개'
+        region_pub = '지역 공개' if self.is_public_to_region else '지역 비공개'
+        return f'{self.club.name}-{self.name}-{all_pub}-{region_pub}'
 
 class UserBoardProfile(models.Model):
     """
-        유저 관련 기타 정보 저장
+        유저 관련 기타 정보 저장:
+        1. 유저가 설정한 메인 게시판
+        2. 유저가 설정한 즐겨찾기 게시판
     """
     # 관련 유저
     user=models.OneToOneField(
