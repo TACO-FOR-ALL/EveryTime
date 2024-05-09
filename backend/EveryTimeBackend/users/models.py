@@ -56,6 +56,10 @@ class Organization(models.Model):
         auto_now_add=True
     )
 
+    @property
+    def created_at_readable(self):
+        return localtime(self.created_at).strftime('%Y-%m-%d %H:%M:%S')
+
     # 지역
     region = models.ForeignKey(
         Region,
@@ -87,6 +91,10 @@ class Club(models.Model):
         auto_now_add=True
     )
 
+    @property
+    def created_at_readable(self):
+        return localtime(self.created_at).strftime('%Y-%m-%d %H:%M:%S')
+
     # 지역
     region = models.ForeignKey(
         Region,
@@ -116,10 +124,18 @@ class OrganizationEmail(models.Model):
         auto_now_add=True
     )
 
+    @property
+    def created_at_readable(self):
+        return localtime(self.created_at).strftime('%Y-%m-%d %H:%M:%S')
+
     # 최근 수정 시간
     last_modified = models.DateTimeField(
         auto_now=True
     )
+
+    @property
+    def last_modified_readable(self):
+        return localtime(self.last_modified).strftime('%Y-%m-%d %H:%M:%S')
 
     # Email Address Suffix
     suffix = models.CharField(
@@ -158,6 +174,10 @@ class EmailAuthentication(models.Model):
     sent_at = models.DateTimeField(
         auto_now_add=True
     )
+
+    @property
+    def sent_at_readable(self):
+        return localtime(self.sent_at).strftime('%Y-%m-%d %H:%M:%S')
 
     verified = models.BooleanField(
         default=False
@@ -244,18 +264,15 @@ class User(AbstractUser):
         auto_now_add=True
     )
 
+    @property
+    def signup_at_readable(self):
+        return localtime(self.signup_at).strftime('%Y-%m-%d %H:%M:%S')
+
     # 프로필 다운 url
     profile = models.URLField(
         blank=True,
         default=''
     )
-
-    def get_readable_signup_at(self):
-        """
-            기능: signup_at 필드를 가독성이 좋은 포맷으로 리턴
-        """
-        readable = localtime(self.signup_at).strftime('%Y-%m-%d %H:%M:%S')
-        return readable
     
     class Meta:
         ordering=['signup_at']

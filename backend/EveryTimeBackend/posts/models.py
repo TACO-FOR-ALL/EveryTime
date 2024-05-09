@@ -48,10 +48,19 @@ class Post(models.Model):
         auto_now_add=True
     )
 
+    # 가독 created_at
+    @property
+    def created_at_readable(self):
+        return localtime(self.created_at).strftime("%Y-%m-%d %H:%M:%S")
+
     # 최근 수정 시간
     last_modified = models.DateTimeField(
         auto_now=True
     )
+
+    @property
+    def last_modified_readable(self):
+        return localtime(self.last_modified).strftime("%Y-%m-%d %H:%M:%S")
 
     class Meta:
         ordering=['created_at']
@@ -59,7 +68,7 @@ class Post(models.Model):
         verbose_name_plural='게시글들'
 
     def __str__(self):
-        return f'{self.board.name}-{self.title}-{localtime(self.created_at).strftime('%Y-%m-%d %H:%M:%S')}'
+        return f'{self.board.name}-{self.title}-{self.created_at_readable}'
     
 class UserPostProfile(models.Model):
     """

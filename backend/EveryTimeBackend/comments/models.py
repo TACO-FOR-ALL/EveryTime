@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.timezone import localtime
 
 from users.models import User
 from posts.models import Post
@@ -27,6 +28,10 @@ class Comment(models.Model):
     created_at=models.DateTimeField(
         auto_now_add=True
     )
+
+    @property
+    def created_at_readable(self):
+        return localtime(self.created_at).strftime('%Y-%m-%d %H:%M:%S')
 
     # 댓글 내용
     # TODO: MULTI-MEDIA?
