@@ -6,7 +6,7 @@ class PostAdmin(admin.ModelAdmin):
     list_display=[
         'get_board_name',
         'title',
-        'author',
+        'get_author_name',
         'created_at',
         'last_modified'
     ]
@@ -20,7 +20,7 @@ class PostAdmin(admin.ModelAdmin):
         if obj.author:
             return obj.author.username
         else: # 게시글 작성자 계정이 삭제된 경우
-            return 'SYSTEM'
+            return 'NULL'
     get_author_name.short_description = 'Author Username'
 
     def get_board_name(self, obj):
