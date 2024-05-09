@@ -25,11 +25,6 @@ class Post(models.Model):
         blank=False
     )
 
-    # 미리보기 사진 프로필 다운 URL
-    profile=models.URLField(
-        default='SYSTEM' #
-    )
-
     # 작성자
     author=models.ForeignKey(
         User,
@@ -73,6 +68,7 @@ class Post(models.Model):
 class UserPostProfile(models.Model):
     """
         유저 관련 기타 정보 저장
+        admin 화면에서의 용이한 관리를 위한 모델
     """
     # 관련 유저
     user=models.OneToOneField(
