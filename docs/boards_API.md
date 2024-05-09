@@ -5,6 +5,7 @@
   - [즐겨찾는게시판요청](#즐겨찾는게시판요청)
   - [메인게시판조작](#메인게시판조작)
   - [즐겨찾기게시판조작](#즐겨찾기게시판조작)
+  - [특정게시판내게시글정보요청](#특정게시판내게시글정보요청)
 
 
 ## 메인게시판요청
@@ -102,3 +103,46 @@ None
 |favorite_board-board_id|string|설정할 즐겨찾기 게시판 id(삭제 조작일 시 빈 값)|
 |favorite_board-is_delete|bool|삭제 조작일 시 true, 추가 조작일 시 false|
 - **RESPONSE PAYLOAD**: **기본 형식**
+
+## 특정게시판내게시글정보요청
+
+>***LOGIN_NEEDED***
+
+- **URL**: `/boards/get/posts/?boardid=<id>&timestamp=<timestamp>&num=<num>&keyword=<keyword>`
+- **METHOD**: `GET`
+- **REOUEST PAYLOAD**:
+```json
+None
+```
+|이름|타입|설명|
+| - | - | - |
+|boardid|string|게시글을 요청하는 게시판의 id|
+|timestamp|string|Pagination을 위한, 마지막으로 표시한 게시글에 해당되는 timestamp, 첫 요청 시 미포함|
+|num|int|요청하는 게시글의 수량|
+|keyword|string|찾고자 하는 게시글 관련 keyword(작성자 닉네임/게시글 제목/게시글 내용), 비검색 요청 시 미포함|
+- **RESPONSE PAYLOAD**:
+```json
+{
+    "posts": [
+      {
+        "profile": "string",
+        "title": "string",
+        "post_id": "string",
+        "board_name": "string",
+        "board_id": "string",
+        "timestamp": "string",
+        "created_at": "string"
+      }
+    ]
+}
+```
+|이름|타입|설명|
+| - | - | - |
+|posts|array|(리스트 획득 성공 시)실시간 베스트 게시글 list, 각 원소는 1개 게시글을 대표함|
+|posts-profile|string|미리보기 이미지 다운로드 url, 빈 리턴값은 지정된 이미지 없음을 나타냄|
+|posts-title|string|게시글 제목|
+|posts-post_id|string|게시글 id|
+|posts-board_name|string|게시판 명칭|
+|posts-board_id|string|게시판 id|
+|posts-timestamp|string|게시글의 timestamp, Pagination에 사용|
+|posts-created_at|string|게시글 등록 시간, 가독 format|
