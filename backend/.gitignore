@@ -6,3 +6,6 @@ logs/*
 
 # Python Cache폴더
 __pycache__
+
+# 임의적 테스트 파일들
+test/*_test.py
