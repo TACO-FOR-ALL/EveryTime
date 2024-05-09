@@ -3,7 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
 
-from posts.utils import get_board_post_by_num, check_post_if_match_keyword
+from posts.utils import get_board_post_by_num, check_post_if_match_keyword, check_post_if_with_media
 from .models import *
 from .utils import CheckBoardPermission
 
@@ -277,7 +277,7 @@ class boards_get_posts_view(LoginNeededView):
                                                   num=num)
                     for post in posts:
                         post_result.append({
-                            "profile": post.profile,
+                            "is_media": check_post_if_with_media(post),
                             "title": post.title,
                             "post_id": post.id,
                             "board_name": post.board.name,
@@ -306,7 +306,7 @@ class boards_get_posts_view(LoginNeededView):
                     for post in posts:
                         if check_post_if_match_keyword(post, keyword): # keyword 매치
                             post_result.append({
-                            "profile": post.profile,
+                            "is_media": check_post_if_with_media(post),
                             "title": post.title,
                             "post_id": post.id,
                             "board_name": post.board.name,

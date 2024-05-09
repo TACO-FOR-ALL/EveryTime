@@ -6,6 +6,8 @@ from django.dispatch import receiver
 from users.models import User
 from boards.models import BaseBoard
 
+
+
 class Post(models.Model):
     """
         게시글 모델.
@@ -64,6 +66,28 @@ class Post(models.Model):
 
     def __str__(self):
         return f'{self.board.name}-{self.title}-{self.created_at_readable}'
+    
+class PostMedia(models.Model):
+    """
+        게시글 내 첨부된 Multi-media 관련 모델 (사진/영상)
+    """
+    post=models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE # 포스트 삭제 시 삭제
+    )
+
+    url=models.URLField(
+        null=False,
+        blank=False
+    )
+
+    class Meta:
+        ordering=['post__created_at']
+        verbose_name='게시글 첨부 사진/영상'
+        verbose_name_plural='게시글 첨부 사진/영상들'
+
+    def __str__(self):
+        return f'{self.post.title}'
     
 class UserPostProfile(models.Model):
     """
