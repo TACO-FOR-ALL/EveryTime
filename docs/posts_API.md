@@ -46,6 +46,9 @@ None
 ```json
 None
 ```
+|이름|타입|설명|
+| - | - | - |
+|postid|string|내용을 요청하는 게시글의 id|
 - **RESPONSE PAYLOAD**:
 ```json
 {
@@ -54,7 +57,9 @@ None
         "url": "string",
         "title": "string",
         "post_id": "string",
-        "board_name": "string"
+        "board_name": "string",
+        "board_id": "string",
+        "created_at": "string"
       }
     ]
 }
@@ -66,3 +71,5 @@ None
 |posts-title|string|게시글 제목|
 |posts-post_id|string|게시글 id|
 |posts-board_name|string|게시판 명칭|
+|posts-board_id|string|게시판 id|
+|posts-created_at|string|게시글 등록 시간(가독 format)|

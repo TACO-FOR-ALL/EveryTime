@@ -1,7 +1,7 @@
 from .models import *
 from users.models import User, UserProfile
 
-def CheckBoardPermission(user: User, board: BaseBoard):
+def CheckBoardPermission(user: User, board: BaseBoard) -> bool:
     """
         유저의 관련 게시판 열람 권한 확인
         열람 가능 시 True 리턴, 불가 시 False 리턴
