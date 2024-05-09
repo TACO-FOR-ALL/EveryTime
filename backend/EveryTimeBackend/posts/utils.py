@@ -13,7 +13,7 @@ def get_board_post_by_num(board: BaseBoard,
     """
         게시글 획득:
         1. 지정한 게시판 'board'의
-        2. timestamp가 'ts'보다 오래된 (ts가 None일 시 제일 최신의 것들을 리턴)
+        2. timestamp가 'ts'와 같거나 오래된 (ts가 None일 시 제일 최신의 것들을 리턴)
         3. 'num'개 획득
 
         주의: 
@@ -25,7 +25,7 @@ def get_board_post_by_num(board: BaseBoard,
         last_seen_datetime = datetime.fromtimestamp(float(ts))
         posts = Post.objects.filter(
             board=board,
-            created_at__lt=last_seen_datetime
+            created_at__lte=last_seen_datetime
             ).order_by('-created_at')[:num]
     else: # 최신 게시글
         posts = Post.objects.filter(
