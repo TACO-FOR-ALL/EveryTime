@@ -51,7 +51,7 @@
 
 >JWT access token 갱신(REFRESH) API
 
-- **URL**: `/users/login`
+- **URL**: `/users/refresh-access-token`
 - **METHOD**: `POST`
 - **REOUEST PAYLOAD**:
 ```json
@@ -89,7 +89,7 @@
 ```
 |이름|타입|설명|
 | - | - | - |
-|username|string|사용자ID|
+|username|string|사용자ID (로그인에 사용)|
 |password|string|사용자PW|
 |email|string|사용자 이메일|
 |organization|string|사용자 소속 학교/단체 id|
