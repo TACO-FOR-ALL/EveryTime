@@ -71,7 +71,6 @@ None
 ```json
 {
     "main_board":{
-        "board_name": "string",
         "board_id": "string",
         "is_delete": bool
     }
@@ -79,8 +78,7 @@ None
 ```
 |이름|타입|설명|
 | - | - | - |
-|main_board-borad_name|string|메인 게시판 이름(설정된 메인 게시판이 없을 경우 빈 값)|
-|main_board-board_id|string|메인 게시판 id|
+|main_board-board_id|string|설정할 메인 게시판 id(삭제 조작일 시 빈 값)|
 |main_board-is_delete|bool|삭제 조작일 시 true, 추가(변경) 조작일 시 false|
 - **RESPONSE PAYLOAD**: **기본 형식**
 
@@ -94,7 +92,6 @@ None
 ```json
 {
     "favorite_board":{
-        "board_name": "string",
         "board_id": "string",
         "is_delete": bool
     }
@@ -102,7 +99,6 @@ None
 ```
 |이름|타입|설명|
 | - | - | - |
-|favorite_board-borad_name|string| 게시판 이름(설정된 메인 게시판이 없을 경우 빈 값)|
-|favorite_board-board_id|string|메인 게시판 id|
+|favorite_board-board_id|string|설정할 즐겨찾기 게시판 id(삭제 조작일 시 빈 값)|
 |favorite_board-is_delete|bool|삭제 조작일 시 true, 추가 조작일 시 false|
 - **RESPONSE PAYLOAD**: **기본 형식**
