@@ -6,6 +6,8 @@ from django.dispatch import receiver
 from users.models import User
 from boards.models import BaseBoard
 
+
+
 class Post(models.Model):
     """
         게시글 모델.
@@ -23,11 +25,6 @@ class Post(models.Model):
     # TODO: MULTI-MEDIA?
     content=models.TextField(
         blank=False
-    )
-
-    # 미리보기 사진 프로필 다운 URL
-    profile=models.URLField(
-        default='SYSTEM' #
     )
 
     # 작성자
@@ -70,9 +67,32 @@ class Post(models.Model):
     def __str__(self):
         return f'{self.board.name}-{self.title}-{self.created_at_readable}'
     
+class PostMedia(models.Model):
+    """
+        게시글 내 첨부된 Multi-media 관련 모델 (사진/영상)
+    """
+    post=models.ForeignKey(
+        Post,
+        on_delete=models.CASCADE # 포스트 삭제 시 삭제
+    )
+
+    url=models.URLField(
+        null=False,
+        blank=False
+    )
+
+    class Meta:
+        ordering=['post__created_at']
+        verbose_name='게시글 첨부 사진/영상'
+        verbose_name_plural='게시글 첨부 사진/영상들'
+
+    def __str__(self):
+        return f'{self.post.title}'
+    
 class UserPostProfile(models.Model):
     """
         유저 관련 기타 정보 저장
+        admin 화면에서의 용이한 관리를 위한 모델
     """
     # 관련 유저
     user=models.OneToOneField(

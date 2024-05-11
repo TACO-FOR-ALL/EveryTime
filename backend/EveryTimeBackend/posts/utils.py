@@ -1,7 +1,7 @@
 from django.utils.dateparse import parse_datetime
 
 from boards.models import BaseBoard
-from .models import Post
+from .models import Post, PostMedia
 
 from datetime import datetime
 from typing import List
@@ -44,3 +44,11 @@ def check_post_if_match_keyword(post: Post,
         에 'keyword'가 포함되어 있는지 체크하고 결과를 리턴
     """
     return (keyword in post.title) or (keyword in post.content)
+
+def check_post_if_with_media(post: Post):
+    """
+        목표 게시글 'post'에 첨부된 사진/영상이 있는지 체크하고 결과를 리턴
+    """
+    if len(PostMedia.objects.filter(post=post)):
+        return True
+    return False

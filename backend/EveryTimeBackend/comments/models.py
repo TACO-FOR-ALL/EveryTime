@@ -51,7 +51,8 @@ class Comment(models.Model):
         
 class UserCommentProfile(models.Model):
     """
-        유저 관련 기타 정보 저장
+        유저 관련 기타 정보 저장,
+        admin 화면에서의 용이한 관리를 위한 모델
     """
     # 관련 유저
     user=models.OneToOneField(
