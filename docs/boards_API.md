@@ -125,7 +125,7 @@ None
 {
     "posts": [
       {
-        "profile": "string",
+        "is_media": bool,
         "title": "string",
         "post_id": "string",
         "board_name": "string",
@@ -139,7 +139,7 @@ None
 |이름|타입|설명|
 | - | - | - |
 |posts|array|(리스트 획득 성공 시)실시간 베스트 게시글 list, 각 원소는 1개 게시글을 대표함|
-|posts-profile|string|미리보기 이미지 다운로드 url, 빈 리턴값은 지정된 이미지 없음을 나타냄|
+|posts-is_media|string|사진/영상 첨부 여부, True 시 첨부|
 |posts-title|string|게시글 제목|
 |posts-post_id|string|게시글 id|
 |posts-board_name|string|게시판 명칭|
