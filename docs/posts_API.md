@@ -52,11 +52,13 @@ None
 - **RESPONSE PAYLOAD**:
 ```json
 {
-    "posts": [
+    "post": [
       {
-        "is_media": bool,
+        "media_urls":[
+          "string",
+          ...
+        ],
         "title": "string",
-        "post_id": "string",
         "board_name": "string",
         "board_id": "string",
         "created_at": "string"
@@ -66,10 +68,8 @@ None
 ```
 |이름|타입|설명|
 | - | - | - |
-|posts|array|(리스트 획득 성공 시)실시간 베스트 게시글 list, 각 원소는 1개 게시글을 대표함|
-|posts-is_media|bool|사진 첨부 여부, true 시 첨부|
+|posts-media_urls|array|사진/영상 등 게시물 첨부물(첨부물 없을 시 빈 Array)|
 |posts-title|string|게시글 제목|
-|posts-post_id|string|게시글 id|
 |posts-board_name|string|게시판 명칭|
 |posts-board_id|string|게시판 id|
 |posts-created_at|string|게시글 등록 시간(가독 format)|

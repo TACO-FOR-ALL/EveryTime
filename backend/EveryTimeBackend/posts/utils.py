@@ -52,3 +52,17 @@ def check_post_if_with_media(post: Post):
     if len(PostMedia.objects.filter(post=post)):
         return True
     return False
+
+def get_post_media_download_urls(post: Post) -> List[str]:
+    """
+        목표 게시글 'post'의:
+        1. 첨부 사진/영상 획득 url
+        리턴
+        없을 시 빈 리스트 리턴
+    """
+    post_medias = PostMedia.objects.filter(post=post).all()
+    if len(post_medias) == 0: # 첨부물 없음
+        return []
+
+    # TODO
+    raise NotImplementedError
