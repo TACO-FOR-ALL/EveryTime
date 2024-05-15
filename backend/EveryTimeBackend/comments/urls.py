@@ -6,7 +6,7 @@ from . import views
     URL prefix: /comments/
 """
 urlpatterns = [
-    # path("main_board", # 메인 게시판 정보
-    #      views.posts_main_board_view.as_view(), 
-    #      name='posts.main_board'),
+    path("get/comments/", # 지정 게시글의 댓글 획득
+         views.comments_get_view.as_view(), 
+         name='comments.get'),
 ]

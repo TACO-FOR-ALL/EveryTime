@@ -116,9 +116,9 @@ None
 ```
 |이름|타입|설명|
 | - | - | - |
-|boardid|string|게시글을 요청하는 게시판의 id|
+|boardid|string|(필수)게시글을 요청하는 게시판의 id|
 |timestamp|string|Pagination을 위한, 마지막으로 표시한 게시글에 해당되는 timestamp, 첫 요청 시 미포함|
-|num|int|요청하는 게시글의 수량|
+|num|int|(필수)요청하는 게시글의 수량|
 |keyword|string|찾고자 하는 게시글 관련 keyword(작성자 닉네임/게시글 제목/게시글 내용), 비검색 요청 시 미포함|
 - **RESPONSE PAYLOAD**:
 ```json
