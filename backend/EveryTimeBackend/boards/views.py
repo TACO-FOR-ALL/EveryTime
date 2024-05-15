@@ -117,27 +117,28 @@ class boards_set_main_board_view(LoginNeededView):
                     raise e
 
             # 설정/변경 조작
+            new_main_board=None
             try:
-                new_main_board=None
-                try:
-                    new_main_board = BaseBoard.objects.get(id=new_main_board_id)
-                except:
-                    return Response(
-                        data=ResponseContent.fail('잘못된 main_board_id!'),
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-                if not CheckBoardPermission(user, new_main_board): # 열람 권한 없음
-                    return Response(
-                        data=ResponseContent.fail("해당 게시판에 대한 권한이 없습니다!"),
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
+                new_main_board = BaseBoard.objects.get(id=new_main_board_id)
+            except:
+                return Response(
+                    data=ResponseContent.fail('잘못된 main_board_id!'),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            if not CheckBoardPermission(user, new_main_board): # 열람 권한 없음
+                return Response(
+                    data=ResponseContent.fail("해당 게시판에 대한 권한이 없습니다!"),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            try:
                 with transaction.atomic():
                     user_board_profile.main_board = new_main_board
                     user_board_profile.save()
-                
-                return Response(
-                    data=ResponseContent.success()
-                )
+
+                    return Response(
+                        data=ResponseContent.success()
+                    )
             except Exception as e:
                 # TODO: LOGGING
                 raise e
@@ -183,35 +184,35 @@ class boards_set_bookmark_boards_view(LoginNeededView):
                         user_board_profile.favorite_boards.remove(board_to_delete)
                         user_board_profile.save()
 
-                    return Response(
-                        data=ResponseContent.success()
-                    )
+                        return Response(
+                            data=ResponseContent.success()
+                        )
                 except Exception as e:
                     # TODO: LOGGING
                     raise e
 
             # 설정 조작
+            new_fav_board=None
             try:
-                new_fav_board=None
-                try:
-                    new_fav_board = BaseBoard.objects.get(id=new_fav_board_id)
-                except:
-                    return Response(
-                        data=ResponseContent.fail('잘못된 fav_board_id!'),
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-                if not CheckBoardPermission(user, new_fav_board): # 열람 권한 없음
-                    return Response(
-                        data=ResponseContent.fail("해당 게시판에 대한 권한이 없습니다!"),
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
+                new_fav_board = BaseBoard.objects.get(id=new_fav_board_id)
+            except:
+                return Response(
+                    data=ResponseContent.fail('잘못된 fav_board_id!'),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            if not CheckBoardPermission(user, new_fav_board): # 열람 권한 없음
+                return Response(
+                    data=ResponseContent.fail("해당 게시판에 대한 권한이 없습니다!"),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            try:
                 with transaction.atomic():
                     user_board_profile.favorite_boards.add(new_fav_board)
                     user_board_profile.save()
                 
-                return Response(
-                    data=ResponseContent.success()
-                )
+                    return Response(
+                        data=ResponseContent.success()
+                    )
             except Exception as e:
                 # TODO: LOGGING
                 raise e

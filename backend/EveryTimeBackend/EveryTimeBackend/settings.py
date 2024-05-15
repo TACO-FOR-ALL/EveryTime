@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'posts', # 게시글 app
     'boards', # 게시판 app
     'comments', # 댓글 app
+    'medias', # 미디어 자원 관리 app
 ]
 
 MIDDLEWARE = [

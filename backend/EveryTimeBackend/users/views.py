@@ -155,13 +155,13 @@ class users_organization_send_auth_email_view(APIView):
                                                          auth_code=cur_auth_code,
                                                          auth_type=EmailAuthentication.SIGNUP)
                     cur_email_auth.save()
-            except:
+
+                    return Response(
+                        ResponseContent.success()
+                    )
+            except Exception as e:
                 # TODO: LOGGING
-                raise Exception("가입인증메일 관련 DB 조작 실패")
-            
-            return Response(
-                ResponseContent.success()
-            )
+                raise e
         except Exception as e: # 서버 에러
             # TODO: LOGGING using str(e)
             print(str(e))
@@ -272,11 +272,9 @@ class users_signup_view(APIView):
                     )
                     new_user.set_password(password_to_use)
                     new_user.save()
-            except:
-                # TODO: LOGGING
-                raise Exception("회원 가입 관련 DB 조작 실패") 
-
-            return Response(ResponseContent.success())
+                    return Response(ResponseContent.success())
+            except Exception as e:
+                raise e
         except Exception as e:
             # TODO: LOGGING using str(e)
             return Response(
@@ -376,11 +374,11 @@ class users_reset_password_send_auth_email_view(APIView):
                                                          auth_code=cur_auth_code,
                                                          auth_type=EmailAuthentication.PWRESET)
                     cur_email_auth.save()
-            except:
+
+                    return Response(ResponseContent.success())
+            except Exception as e:
                 # TODO: LOGGING
-                raise Exception("가입인증메일 관련 DB 조작 실패")
-            
-            return Response(ResponseContent.success())
+                raise e
         except:
             # TODO: LOGGING using str(e)
             return Response(
@@ -479,11 +477,11 @@ class users_reset_password_set_password_view(APIView):
                     email_auth_to_check.delete()
                     user_to_use.set_password(password_to_use)
                     user_to_use.save()
-            except:
-                # TODO: LOGGING
-                raise Exception("비밀번호 변경 관련 DB 조작 실패") 
 
-            return Response(ResponseContent.success())
+                    return Response(ResponseContent.success())
+            except Exception as e:
+                # TODO: LOGGING
+                raise e
             
         except:
             return Response(
@@ -541,9 +539,9 @@ class users_nickname_view(LoginNeededView):
                     user.nickname = nickname_to_use
                     user.save()
 
-                return Response( # 성공
-                    ResponseContent.success()
-                )
+                    return Response( # 성공
+                        ResponseContent.success()
+                    )
             except Exception as e:
                 # TODO: LOGGING
                 raise e

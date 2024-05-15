@@ -1,7 +1,10 @@
 # 카테고리
 
 1. [계정](users_API.md)
-2. [게시글](posts_API.md)
+2. [게시판](boards_API.md)
+3. [게시글](posts_API.md)
+4. [댓글](comments_API.md)
+5. [미디어](medias_API.md)
 
 ## 동일 양식
 

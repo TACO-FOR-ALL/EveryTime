@@ -1,6 +1,6 @@
 def generate_auth_code() -> str:
     """
-        Developer: 박찬빈
+        Developer: Macchiato
         기능: 100000~999999 사이의 랜덤 숫자를 str의 형식으로 리턴
     """
     import random
@@ -8,7 +8,7 @@ def generate_auth_code() -> str:
 
 class ResponseContent(object):
     """
-        Developer: 박찬빈
+        Developer: Macchiato
         기능: 모든 View Function의 Return을 표준화하기 위한 Class
     """
     @staticmethod
