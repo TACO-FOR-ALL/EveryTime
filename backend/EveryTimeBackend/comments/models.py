@@ -6,8 +6,6 @@ from django.utils.timezone import localtime
 from users.models import User
 from posts.models import Post
 
-# TODO: 답글?
-
 class Comment(models.Model):
     """
         댓글 모델
@@ -19,9 +17,23 @@ class Comment(models.Model):
         on_delete=models.SET_NULL
     )
 
+    # 댓글을 단 게시글
     post=models.ForeignKey(
         Post,
         on_delete=models.CASCADE
+    )
+
+    # 답글일 시, 답한 댓글 (Comment Instance) 의 ID
+    # 해당 값이 null일 시, 게시글에 대한 직접적인 댓글
+    # ForeignKey 등 Relation의 Integration을 활용할 수 없음으로 사용 시 각별히 주의
+    replying_to=models.IntegerField(
+        null=True,
+        default=None
+    )
+
+    # 삭제 여부 (삭제를 하지 않고 삭제한 댓글로 남김)
+    is_deleted=models.BooleanField(
+        default=False
     )
 
     # 등록 시간
@@ -34,10 +46,15 @@ class Comment(models.Model):
         return localtime(self.created_at).strftime('%Y-%m-%d %H:%M:%S')
 
     # 댓글 내용
-    # TODO: MULTI-MEDIA?
     content=models.TextField(
         max_length=1024,
         blank=False
+    )
+
+    # 답글에 좋아요를 누른 유저들
+    like_users=models.ManyToManyField(
+        User,
+        related_name='liked_comments'
     )
 
     class Meta:
@@ -47,7 +64,9 @@ class Comment(models.Model):
 
     def __str__(self):
         if self.author:
-            return f'{self.author.username}-{self.post.title}'
+            return f'{self.author.username}-{self.post.title}-like:{str(len(self.like_users.all()))}'
+        else:
+            return f'NULL-{self.post.title}-like:{str(len(self.like_users.all()))}'
         
 class UserCommentProfile(models.Model):
     """
