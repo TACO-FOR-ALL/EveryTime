@@ -6,6 +6,7 @@
   - [메인게시판조작](#메인게시판조작)
   - [즐겨찾기게시판조작](#즐겨찾기게시판조작)
   - [특정게시판내게시글정보요청](#특정게시판내게시글정보요청)
+  - [게시판관리자권한확인요청](#게시판관리자권한확인요청)
 
 
 ## 메인게시판요청
@@ -148,3 +149,30 @@ None
 |posts-timestamp|string|게시글의 timestamp, Pagination에 사용|
 |posts-created_at|string|게시글 등록 시간, 가독 format|
 |posts-author_nickname|string|게시글 작성자 노출명, 익명 게시글인 경우 빈값, 본인 게시글인 경우 '나'|
+
+## 게시판관리자권한확인요청
+
+>***LOGIN_NEEDED***
+
+- **URL**: `/boards/admin/?boardid=<boardid>`
+- **METHOD**: `GET`
+- **REQUEST PAYLOAD**:
+```json
+None
+```
+|이름|타입|설명|
+| - | - | - |
+|boardid|string|관리자 권한 보유 여부를 확인하고자 하는 게시판 id|
+
+**주의:** 본인 권한 확인용
+
+- **RESPONSE PAYLOAD**:
+
+```json
+{
+    "is_admin": bool
+}
+```
+|이름|타입|설명|
+| - | - | - |
+|is_admin|bool|해당 게시판 관리자 권한 보유 시 True|

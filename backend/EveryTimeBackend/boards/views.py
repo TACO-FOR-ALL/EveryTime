@@ -351,3 +351,47 @@ class boards_get_posts_view(LoginNeededView):
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
+        
+class boards_admin_view(LoginNeededView):
+    """
+        Developer: Macchiato
+        API: /boards/admin/?boardid=<boardid>
+        기능: 요청을 보낸 유저의 지정 게시판에 대한 관리자 권한 보유 여부 리턴
+    """
+    def get(self, request: Request):
+        user=self.get_user(request)
+        try:
+            board_id_to_use = request.query_params.get('boardid', None)
+
+            if board_id_to_use is None:
+                return Response(
+                    data=ResponseContent.fail("필수 파라미터 boardid 부재!"),
+                    stauts=status.HTTP_400_BAD_REQUEST
+                )
+            
+            obj_board=None
+            try:
+                obj_board = BaseBoard.objects.get(id=board_id_to_use)
+            except:
+                return Response(
+                    data=ResponseContent.fail("잘못된 boardid!"),
+                    stauts=status.HTTP_400_BAD_REQUEST
+                )
+            
+            if user in obj_board.admins:
+                is_admin = True
+            else:
+                is_admin = False
+
+            return Response(
+                data=ResponseContent.success(
+                    data=is_admin
+                    data_field_name='is_admin'
+                )
+            )
+        except:
+            # TODO: LOGGING
+            return Response(
+                data=ResponseContent.fail("서버 에러!"),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
