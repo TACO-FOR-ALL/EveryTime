@@ -5,16 +5,22 @@ from .models import *
 class UserProfileAdmin(admin.ModelAdmin):
     list_display = [
         'get_user_username',
+        'get_user_nickname',
         'get_clubs'
     ]
     search_fields = [
         'user__username',
+        'user__nickname'
         'clubs__name'
     ]
 
     def get_user_username(self, obj):
         return obj.user.username
     get_user_username.short_description = 'User username'
+
+    def get_user_nickname(self, obj):
+        return obj.user.nickname
+    get_user_username.short_description = 'User nickname'
 
     def get_clubs(self, obj):
         return ','.join([club.name 
@@ -94,11 +100,13 @@ class EmailAuthenticationAdmin(admin.ModelAdmin):
 class UserAdmin(admin.ModelAdmin):
     list_display = [
         'username',
+        'nickname',
         'get_organization_name',
         'signup_at'
     ]
     search_fields = [
         'username',
+        'nickname',
         'organization__name'
     ]
 

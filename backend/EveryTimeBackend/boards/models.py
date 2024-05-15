@@ -128,7 +128,8 @@ class UserBoardProfile(models.Model):
     # 유저가 즐겨찾기한 게시판
     favorite_boards=models.ManyToManyField(
         BaseBoard,
-        related_name='favorited_by'
+        blank=True,
+        related_name='favorited_by',
     )
 
     class Meta:

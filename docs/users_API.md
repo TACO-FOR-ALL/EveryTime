@@ -84,16 +84,18 @@
 {
     "username":"string",
     "password":"string",
+    "nickname": "string",
     "email":"string",
-    "organization": "string"
+    "organization_id": "string"
 }
 ```
 |이름|타입|설명|
 | - | - | - |
-|username|string|사용자ID (로그인에 사용)|
+|username|string|사용자ID, 로그인에 사용|
 |password|string|사용자PW|
+|nickname|string|사용자 닉네임, 비익명 게시글 작성 시에 사용할 nickname|
 |email|string|사용자 이메일|
-|organization|string|사용자 소속 학교/단체 id|
+|organization_id|string|사용자 소속 학교/단체 id|
 
 - **RESPONSE PAYLOAD**: **기본 형식**
 
@@ -269,7 +271,7 @@ None
 ```
 |이름|타입|설명|
 | - | - | - |
-|nickname|string|본인의 노출명, 미설정 시 빈값|
+|nickname|string|본인의 비익명 게시글 노출명|
 
 ## 비익명게시글노출명설정
 
@@ -286,6 +288,8 @@ None
 |이름|타입|설명|
 | - | - | - |
 |nickname|string|새로 설정할 노출명|
+
+**주의**: 본인의 노출명만 설정 가능
 
 - **RESPONSE PAYLOAD**: **기본 형식**
 

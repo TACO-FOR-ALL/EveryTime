@@ -231,14 +231,26 @@ class users_signup_view(APIView):
     """
     def post(self, request: Request):
         try:
-            username_to_use = request.data.get('username')
-            password_to_use = request.data.get('password')
-            email_to_use = request.data.get('email')
-            organization_id_to_use = request.data.get('organization')
+            username_to_use = request.data.get('username', None)
+            password_to_use = request.data.get('password', None)
+            nickname_to_use = request.data.get('nickname', None)
+            email_to_use = request.data.get('email', None)
+            organization_id_to_use = request.data.get('organization_id', None)
+
+            if not (username_to_use and password_to_use and nickname_to_use and email_to_use and organization_id_to_use):
+                return Response(
+                    data=ResponseContent.fail("필수 파라미터 부재"),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
             if User.objects.filter(username=username_to_use).exists():
                 return Response(
                     data=ResponseContent.fail(f"해당 ID: {username_to_use}는 사용 중입니다."),
+                    status=status.HTTP_409_CONFLICT
+                )
+            if User.objects.filter(nickname=nickname_to_use).exists():
+                return Response(
+                    data=ResponseContent.fail(f"해당 닉네임: {nickname_to_use}는 사용 중입니다."),
                     status=status.HTTP_409_CONFLICT
                 )
             
@@ -493,14 +505,12 @@ class users_nickname_view(LoginNeededView):
     """
         Developer: Macchiato
         API: /users/nickname
-        기능: 비익명 게시글 작성 시 노출명 관련 view
+        기능: 유저 본인의 비익명 게시글 작성 시 노출명 획득 view
     """
     def get(self, request: Request):
         user=self.get_user(request)
         try:
             nickname = user.nickname
-            if nickname is None: # 노출명 미설정
-                nickname = ''
 
             return Response(
                 ResponseContent.success(

@@ -27,6 +27,7 @@ class Comment(models.Model):
     # ForeignKey 등 Relation의 Integration을 활용할 수 없음으로 사용 시 각별히 주의
     replying_to=models.IntegerField(
         null=True,
+        blank=True,
         default=None
     )
 
@@ -53,7 +54,8 @@ class Comment(models.Model):
     # 답글에 좋아요를 누른 유저들
     like_users=models.ManyToManyField(
         User,
-        related_name='liked_comments'
+        related_name='liked_comments',
+        blank=True
     )
 
     class Meta:
@@ -80,7 +82,8 @@ class UserCommentProfile(models.Model):
 
     # 유저가 작성한 댓글
     comments=models.ManyToManyField(
-        Comment
+        Comment,
+        blank=True
     )
 
 # User모델 생성 시, UserCommentProfile 자동 생성

@@ -267,18 +267,17 @@ class User(AbstractUser):
         auto_now_add=True
     )
 
-    # 비익명 게시글 작성 시 노출명
-    nickname = models.CharField(
-        max_length=255,
-        default=None, # 기본적으론 비설정, 설정 후에만 비익명 게시글 업로드 가능
-        null=True,
-        blank=False, # 빈값은 사용하지 않음, 빈값은 API 통신 간에 '노출명 미설정'을 나타냄
-        unique=True
-    )
-
     @property
     def signup_at_readable(self):
         return localtime(self.signup_at).strftime('%Y-%m-%d %H:%M:%S')
+
+    # 비익명 게시글 작성 시 노출명
+    nickname = models.CharField(
+        max_length=255,
+        default='',
+        blank=False, # 빈값은 사용하지 않음, 빈값은 API 통신 간에 '노출명 미설정'을 나타냄
+        unique=True
+    )
     
     class Meta:
         ordering=['signup_at']
@@ -287,7 +286,7 @@ class User(AbstractUser):
 
     def __str__(self):
         if self.organization:
-            return self.organization.region.name + '-' + self.organization.name + '-' + self.username
+            return f'{self.organization.region.name}-{self.organization.name}-닉네임:{self.nickname}-id:{self.username}'
         else:
             return self.username
         
@@ -303,7 +302,8 @@ class UserProfile(models.Model):
     )
 
     clubs=models.ManyToManyField(
-        Club
+        Club,
+        blank=True
     )
 
     class Meta:

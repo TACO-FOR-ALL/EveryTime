@@ -5,16 +5,22 @@ from .models import *
 class UserBoardProfileAdmin(admin.ModelAdmin):
     list_display = [
         'get_user_username',
+        'get_user_nickname',
         'get_mainboard_name',
         'get_favorite_boards'
     ]
     search_fields = [
-        'user__username'
+        'user__username',
+        'user__nickname'
     ]
 
     def get_user_username(self, obj):
         return obj.user.username
     get_user_username.short_description = 'User username'
+
+    def get_user_nickname(self, obj):
+        return obj.user.nickname
+    get_user_nickname.short_description = 'User nickname'
 
     def get_mainboard_name(self, obj):
         if obj.main_board:

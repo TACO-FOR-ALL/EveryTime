@@ -114,15 +114,6 @@ class posts_upload_view(LoginNeededView):
                     data=ResponseContent.fail('잘못된 형식의 anonymous, boolean 형식 필요'),
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
-            # 비익명으로 업로드하나 비익명 게시글 노출명 미설정
-            if (not anonymous_to_use) and (user.nickname is None):
-                return Response(
-                    data=ResponseContent.fail("""
-                        비익명 게시글 등록을 위해선 비익명 게시글 노출명을 설정해야 합니다!
-                    """),
-                    status=status.HTTP_400_BAD_REQUEST
-                )
                 
             # 파라미터 전환2    
             try:

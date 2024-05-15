@@ -88,7 +88,8 @@ class UserPostProfile(models.Model):
 
     # 유저가 작성한 게시글
     posts=models.ManyToManyField(
-        Post
+        Post,
+        blank=True
     )
 
 # User모델 생성 시, UserPostProfile 자동 생성
