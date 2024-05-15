@@ -11,7 +11,8 @@
   - [비밀번호리셋인증메일발송요청](#비밀번호리셋인증메일발송요청)
   - [비밀번호리셋인증메일확인요청](#비밀번호리셋인증메일확인요청)
   - [비밀번호리셋요청](#비밀번호리셋요청)
-  - [프로필사진요청](#프로필사진요청)
+  - [비익명게시글노출명요청](#비익명게시글노출명요청)
+  - [비익명게시글노출명설정](#비익명게시글노출명설정)
 
 ## 로그인
 
@@ -247,22 +248,45 @@ None
 
 - **RESPONSE PAYLOAD**: **기본 형식**
 
-## 프로필사진요청
+## 비익명게시글노출명요청
+
 >***LOGIN_NEEDED***
 
-- **URL**: `/users/profile`
+- **URL**: `/users/nickname`
 - **METHOD**: `GET`
 - **REQUEST PAYLOAD**:
 ```json
 None
 ```
-- **RESPONSE PAYLOAD**: **기본 형식**
 
+**주의**: 본인의 노출명만 요청 가능
+
+- **RESPONSE PAYLOAD**:
 ```json
 {
-    "url": "string"
+    "nickname": "string"
 }
 ```
 |이름|타입|설명|
 | - | - | - |
-|url|string|프로필 사진 다운로드 url (지정한 프로필 없을 시 빈 값)|
+|nickname|string|본인의 노출명, 미설정 시 빈값|
+
+## 비익명게시글노출명설정
+
+>***LOGIN_NEEDED***
+
+- **URL**: `/users/nickname`
+- **METHOD**: `POST`
+- **REQUEST PAYLOAD**:
+```json
+{
+    "nickname": "string"
+}
+```
+|이름|타입|설명|
+| - | - | - |
+|nickname|string|새로 설정할 노출명|
+
+- **RESPONSE PAYLOAD**: **기본 형식**
+
+**주의**: 비익명 게시글 노출명은 **1달에 1번만 변경이 가능**하며, **설정 후 삭제 불가**, 적어도 2글자 이상의 이름을 설정할 것

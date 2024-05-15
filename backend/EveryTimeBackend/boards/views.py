@@ -17,8 +17,8 @@ class boards_get_main_board_view(LoginNeededView):
         기능: 요청을 보낸 유저가 등록한 메인 게시판 관련 정보 리턴
     """
 
-    def get(self, request):
-        user = self.get_user()
+    def get(self, request: Request):
+        user = self.get_user(request)
         try:
             user_board_profile=None
             user_board_profile = UserBoardProfile.objects.get(user=user)
@@ -51,8 +51,8 @@ class boards_get_bookmark_boards_view(LoginNeededView):
         기능: 요청을 보낸 유저가 즐겨찾기한 게시판 관련 정보 리턴
     """
 
-    def get(self, request):
-        user = self.get_user()
+    def get(self, request: Request):
+        user = self.get_user(request)
         try:
             user_board_profile = UserBoardProfile.objects.get(user=user)
             favorite_boards = user_board_profile.favorite_boards.all()
@@ -85,7 +85,7 @@ class boards_set_main_board_view(LoginNeededView):
         기능: 유저의 메인 게시판에 대한 조작
     """
     def post(self, request: Request):
-        user = self.get_user()
+        user = self.get_user(request)
         try:
             user_board_profile = UserBoardProfile.objects.get(user=user)
             new_main_board_info = {}
@@ -156,8 +156,8 @@ class boards_set_bookmark_boards_view(LoginNeededView):
         API: /boards/set/bookmark_boards
         기능: 유저의 즐겨찾기 게시판에 대한 조작
     """
-    def post(self, request):
-        user = self.get_user()
+    def post(self, request: Request):
+        user = self.get_user(request)
         try:
             user_board_profile = UserBoardProfile.objects.get(user=user)
             new_fav_board_info = {}
@@ -230,7 +230,7 @@ class boards_get_posts_view(LoginNeededView):
         기능: 지정 게시판 내 게시글 (Pagination/Search 가능) 획득
     """
     def get(self, request: Request):
-        user = self.get_user()
+        user = self.get_user(request)
         try:
             board_id = request.query_params.get('boardid', None)
             last_seen_timestamp = request.query_params.get('timestamp', None)
@@ -276,15 +276,23 @@ class boards_get_posts_view(LoginNeededView):
                                                   ts=last_seen_timestamp,
                                                   num=num)
                     for post in posts:
-                        post_result.append({
+                        cur_dict = {
                             "is_media": check_post_if_with_media(post),
                             "title": post.title,
                             "post_id": post.id,
                             "board_name": post.board.name,
                             "board_id": post.board.id,
                             "timestamp": post.created_at.timestamp(),
-                            "created_at": post.created_at_readable
-                        })
+                            "created_at": post.created_at_readable,
+                            "author_nickname": ''
+                        }
+                        # 비익명 게시글
+                        if not post.anonymous:
+                            cur_dict['author_nickname'] = post.author.nickname
+                        # 자신의 게시글
+                        if post.author == user:
+                            cur_dict['author_nickname'] = '나'
+                        post_result.append(cur_dict)
                         
                     return Response(
                         data=ResponseContent.success(

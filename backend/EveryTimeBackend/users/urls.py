@@ -50,8 +50,8 @@ urlpatterns = [
           views.users_reset_password_set_password_view.as_view(),
           name='users.reset_password.set_password'),
 
-     path("profile",
-          views.users_profile_view.as_view(),
-          name='users.main_board'),
+     path("nickname",
+          views.users_nickname_view.as_view(),
+          name='users.nickname')
      
 ]

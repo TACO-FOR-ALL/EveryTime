@@ -1,3 +1,4 @@
+from rest_framework.request import Request
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -36,7 +37,7 @@ class users_organization_list_view(APIView):
         API: /users/organization/list
         기능: 가입 가능 학교/단체 리스트 제공
     """
-    def get(self, request):
+    def get(self, request: Request):
         try:
             organizations = Organization.objects.all()
             serializer = OrganizationSerializer(organizations, many=True)
@@ -55,7 +56,7 @@ class users_organization_mails_view(APIView):
         API: /users/organization/emails
         기능: 선택한 학교/단체에서 인증에 사용할 수 있는 메일 제공
     """
-    def post(self, request):
+    def post(self, request: Request):
         try:
             org_id_to_use = request.data.get('org_id')
 
@@ -94,7 +95,7 @@ class users_organization_send_auth_email_view(APIView):
         API: /users/organization/send_auth_email
         기능: 사용자가 제공한 이메일로 인증 메일 발송
     """
-    def post(self, request):
+    def post(self, request: Request):
         try:
             org_id_to_use = request.data.get('organization_id')
             email_to_use = request.data.get('email')
@@ -175,7 +176,7 @@ class users_organization_check_auth_code_view(APIView):
         API: /users/organization/check_auth_code
         기능: 사용자가 frontend에 입력한 인증코드와 발송한 인증코드 대조
     """
-    def post(self, request):
+    def post(self, request: Request):
         try:
             email_to_check = request.data.get('email')
             code_to_check = request.data.get('code')
@@ -228,7 +229,7 @@ class users_signup_view(APIView):
         API: /users/signup
         기능: 회원가입
     """
-    def post(self, request):
+    def post(self, request: Request):
         try:
             username_to_use = request.data.get('username')
             password_to_use = request.data.get('password')
@@ -289,7 +290,7 @@ class users_login_view(APIView):
         API: /users/login
         기능: 로그인, JWT인증 중 TokenObtainPairView의 역할을 함.
     """
-    def post(self, request):
+    def post(self, request: Request):
         try:
             username_to_use = request.data.get('username')
             password_to_use = request.data.get('password')
@@ -333,7 +334,7 @@ class users_reset_password_send_auth_email_view(APIView):
         API: /users/reset-password/send_auth_email
         기능: 가입 시 사용한 이메일을 받아 비밀번호 리셋용 인증 코드 전송
     """
-    def post(self, request):
+    def post(self, request: Request):
         try:
             email_to_use = request.data.get('email')
 
@@ -393,7 +394,7 @@ class users_reset_password_check_auth_code_view(APIView):
         API: /users/reset-password/send_auth_email
         기능: 가입 시 사용한 이메일을 받아 비밀번호 리셋용 인증 코드 전송
     """
-    def post(self, request):
+    def post(self, request: Request):
         try:
             email_to_check = request.data.get('email')
             code_to_check = request.data.get('code')
@@ -441,7 +442,7 @@ class users_reset_password_set_password_view(APIView):
         API: /users/reset-password/send_auth_email
         기능: 가입 시 사용한 이메일을 받아 비밀번호 리셋용 인증 코드 전송
     """
-    def post(self, request):
+    def post(self, request: Request):
         try:
             email_to_use = request.data.get('email')
             password_to_use = request.data.get('password')
@@ -489,22 +490,65 @@ class users_reset_password_set_password_view(APIView):
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )
-
-class users_profile_view(LoginNeededView):
+        
+class users_nickname_view(LoginNeededView):
     """
         Developer: Macchiato
-        API: /users/profile
-        기능: 요청을 보낸 유저의 프로필 사진을 다운로드할 수 있는 url 리턴
+        API: /users/nickname
+        기능: 비익명 게시글 작성 시 노출명 관련 view
     """
-    def get(self, request):
-        user=self.get_user()
+    def get(self, request: Request):
+        user=self.get_user(request)
         try:
+            nickname = user.nickname
+            if nickname is None: # 노출명 미설정
+                nickname = ''
+
             return Response(
-                data=ResponseContent.success(
-                    data=user.profile,
-                    data_field_name='url'
+                ResponseContent.success(
+                    data=nickname,
+                    data_field_name='nickname'
                 )
             )
+        except:
+            # TODO: LOGGING
+            return Response(
+                data=ResponseContent.fail("서버 에러!"),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+    def post(self, request: Request):
+        user=self.get_user(request)
+        try:
+            nickname_to_use = request.data.get('nickname')
+            
+            # 필수 파라미터 부재
+            if nickname_to_use is None:
+                return Response(
+                    data=ResponseContent.fail("노출명 미제공!"),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # 노출명 사용 중
+            if User.objects.filter(nickname=nickname_to_use).first():
+                return Response(
+                    data=ResponseContent.fail(f"해당 노출명: {nickname_to_use}은 사용 중입니다."),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+            try: # 노출명 설정
+                with transaction.atomic():
+                    user.nickname = nickname_to_use
+                    user.save()
+
+                return Response( # 성공
+                    ResponseContent.success()
+                )
+            except Exception as e:
+                # TODO: LOGGING
+                raise e
+            
+
         except:
             # TODO: LOGGING
             return Response(

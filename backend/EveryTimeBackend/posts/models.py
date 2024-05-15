@@ -22,7 +22,6 @@ class Post(models.Model):
     )
 
     # 내용 (text only)
-    # TODO: MULTI-MEDIA?
     content=models.TextField(
         blank=False
     )
@@ -42,6 +41,11 @@ class Post(models.Model):
     # 등록 시간
     created_at = models.DateTimeField(
         auto_now_add=True
+    )
+
+    # 익명 여부
+    anonymous = models.BooleanField(
+        default=True
     )
 
     # 가독 created_at

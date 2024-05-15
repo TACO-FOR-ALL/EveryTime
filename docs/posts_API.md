@@ -61,7 +61,8 @@ None
         "title": "string",
         "board_name": "string",
         "board_id": "string",
-        "created_at": "string"
+        "created_at": "string",
+        "nickname": "string"
       }
     ]
 }
@@ -73,3 +74,4 @@ None
 |posts-board_name|string|게시판 명칭|
 |posts-board_id|string|게시판 id|
 |posts-created_at|string|게시글 등록 시간(가독 format)|
+|posts-nickname|string|게시글 작성자 노출명 nickname, 익명 게시글인 경우 빈값, 본인 게시글인 경우 '나'|

@@ -22,7 +22,7 @@ class comments_get_view(LoginNeededView):
         기능: 특정 게시글에 해당되는 댓글 리턴
     """
     def get(self, request: Request):
-        user=self.get_user()
+        user=self.get_user(request)
         try:
             post_id = request.query_params.get('posttid', None)
             num = request.query_params.get('num', None)

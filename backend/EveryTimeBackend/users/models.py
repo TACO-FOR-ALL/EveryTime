@@ -248,6 +248,9 @@ class User(AbstractUser):
     """
         Django에서 제공한 User 모델을 기반으로 확장한 모델.
         username, password을 필수적으로 제공해야 함. (email은 임의적으로 강제)
+
+        주의: 해당 User 데이터는 사용자 탈퇴 후에도 삭제하지 않음, 이는 댓글/게시글 관련 데이터 완전성을 보존하기 위함.
+        하지만 email 등의 기본 정보는 추후 사용자 약관 제정 후 삭제가 필요할 시 null로 처리하는 등의 방안을 고려.
     """
     # 소속 단체
     organization = models.ForeignKey(
@@ -264,15 +267,18 @@ class User(AbstractUser):
         auto_now_add=True
     )
 
+    # 비익명 게시글 작성 시 노출명
+    nickname = models.CharField(
+        max_length=255,
+        default=None, # 기본적으론 비설정, 설정 후에만 비익명 게시글 업로드 가능
+        null=True,
+        blank=False, # 빈값은 사용하지 않음, 빈값은 API 통신 간에 '노출명 미설정'을 나타냄
+        unique=True
+    )
+
     @property
     def signup_at_readable(self):
         return localtime(self.signup_at).strftime('%Y-%m-%d %H:%M:%S')
-
-    # 프로필 다운 url
-    profile = models.URLField(
-        blank=True,
-        default=''
-    )
     
     class Meta:
         ordering=['signup_at']

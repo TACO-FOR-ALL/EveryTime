@@ -14,7 +14,7 @@ class posts_realtime_best_view(LoginNeededView):
         API: /posts/realtime_best
         기능: 실시간 베스트 게시글 목록 리턴
     """
-    def get(self, request):
+    def get(self, request: Request):
         raise NotImplementedError
         # TODO
 
@@ -25,7 +25,7 @@ class posts_get_view(LoginNeededView):
         기능: 게시글 내용 리턴
     """
     def get(self, request: Request):
-        user=self.get_user()
+        user=self.get_user(request)
         try:
             post_id = request.query_params.get('postid', None)
             
@@ -57,8 +57,16 @@ class posts_get_view(LoginNeededView):
                     'title': obj_post.title,
                     'board_name': obj_post.board.name,
                     'board_id':obj_post.board.id,
-                    'created_at':obj_post.created_at_readable
+                    'created_at':obj_post.created_at_readable,
+                    'nickname': ''
                 }
+
+                # 비익명 게시글일 시
+                if not obj_post.anonymous:
+                    result['nickname'] = obj_post.author.nickname
+                # 본인 게시글일 시
+                if obj_post.author == user:
+                    result['nickname'] = '나'
 
                 return Response(
                     data=ResponseContent.success(
