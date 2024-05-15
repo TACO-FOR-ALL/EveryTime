@@ -15,7 +15,7 @@ None
 ```
 |이름|타입|설명|
 | - | - | - |
-|commentid|string|(필수)댓글을 요청하는 게시글의 id|
+|postid|string|(필수)댓글을 요청하는 게시글의 id|
 |timestamp|string|Pagination을 위한, 마지막으로 표시한 댓글에 해당되는 timestamp, 첫 요청 시 미포함|
 |num|int|(필수),요청하는 댓글의 수량|
 
