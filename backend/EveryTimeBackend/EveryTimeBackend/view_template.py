@@ -4,6 +4,8 @@ from rest_framework.request import Request
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import AuthenticationFailed
 
+from users.models import User
+
 class LoginNeededView(APIView):
     """
         로그인이 필요한 API의 Base Class
@@ -11,7 +13,7 @@ class LoginNeededView(APIView):
     authentication_classes = [JWTAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get_user(self, request: Request):
+    def get_user(self, request: Request) -> User:
         jwt_authentication = JWTAuthentication()
         try:
             user, _ = jwt_authentication.authenticate(request)

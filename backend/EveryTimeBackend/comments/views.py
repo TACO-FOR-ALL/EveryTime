@@ -22,7 +22,7 @@ class comments_get_view(LoginNeededView):
         기능: 특정 게시글에 해당되는 댓글 리턴
     """
     def get(self, request: Request):
-        user=self.get_user()
+        user=self.get_user(request)
         try:
             post_id = request.query_params.get('posttid', None)
             num = request.query_params.get('num', None)
@@ -41,7 +41,8 @@ class comments_get_view(LoginNeededView):
             
             obj_post = None
             try: # 해당 id의 post 검색
-                obj_post = Post.objects.get(id=post_id)
+                obj_post = Post.objects.get(id=post_id,
+                                            pending=False)
             except:
                 return Response(
                     data=ResponseContent.fail('잘못된 postid!'),

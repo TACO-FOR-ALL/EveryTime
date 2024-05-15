@@ -23,4 +23,5 @@ urlpatterns = [
     path('posts/', include("posts.urls")),
     path('boards/', include("boards.urls")),
     path('comments/', include("comments.urls")),
+    path('medias/', include("medias.urls")),
 ]

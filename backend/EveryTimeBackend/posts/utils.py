@@ -1,7 +1,9 @@
 from django.utils.dateparse import parse_datetime
 
 from boards.models import BaseBoard
-from .models import Post, PostMedia
+from posts.models import Post
+from medias.models import PostMedia
+from medias.utils import get_media_download_url
 
 from datetime import datetime
 from typing import List
@@ -25,11 +27,13 @@ def get_board_post_by_num(board: BaseBoard,
         last_seen_datetime = datetime.fromtimestamp(float(ts))
         posts = Post.objects.filter(
             board=board,
-            created_at__lte=last_seen_datetime
+            created_at__lte=last_seen_datetime,
+            pending=False
             ).order_by('-created_at')[:num]
     else: # 최신 게시글
         posts = Post.objects.filter(
-            board=board
+            board=board,
+            pending=False
         ).order_by('-created_at')[:num]
 
     return posts
@@ -49,20 +53,12 @@ def check_post_if_with_media(post: Post):
     """
         목표 게시글 'post'에 첨부된 사진/영상이 있는지 체크하고 결과를 리턴
     """
-    if len(PostMedia.objects.filter(post=post)):
-        return True
-    return False
+    return PostMedia.objects.filter(post=post).exists()
 
 def get_post_media_download_urls(post: Post) -> List[str]:
     """
-        목표 게시글 'post'의:
-        1. 첨부 사진/영상 획득 url
-        리턴
-        없을 시 빈 리스트 리턴
+        목표 게시글 'post'에 첨부된 사진/영상들의 다운로드 url을 리턴
     """
-    post_medias = PostMedia.objects.filter(post=post).all()
-    if len(post_medias) == 0: # 첨부물 없음
-        return []
-
-    # TODO
-    raise NotImplementedError
+    medias = PostMedia.objects.filter(post=post).all()
+    result = [get_media_download_url(media.object_key) for media in medias]
+    return result

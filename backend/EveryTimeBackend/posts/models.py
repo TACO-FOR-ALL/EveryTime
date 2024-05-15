@@ -22,7 +22,6 @@ class Post(models.Model):
     )
 
     # 내용 (text only)
-    # TODO: MULTI-MEDIA?
     content=models.TextField(
         blank=False
     )
@@ -30,8 +29,7 @@ class Post(models.Model):
     # 작성자
     author=models.ForeignKey(
         User,
-        null=True,
-        on_delete=models.SET_NULL, # 유저 삭제 시, 작성자=NULL
+        on_delete=models.PROTECT,
     )
 
     # 게시판
@@ -50,6 +48,16 @@ class Post(models.Model):
     def created_at_readable(self):
         return localtime(self.created_at).strftime("%Y-%m-%d %H:%M:%S")
 
+    # 익명 여부
+    anonymous = models.BooleanField(
+        default=True
+    )
+
+    # 미디어 업로드 대기 중 (False로 전환할 때 created_at을 업데이트)
+    pending = models.BooleanField(
+        default=True
+    )
+
     # 최근 수정 시간
     last_modified = models.DateTimeField(
         auto_now=True
@@ -65,29 +73,7 @@ class Post(models.Model):
         verbose_name_plural='게시글들'
 
     def __str__(self):
-        return f'{self.board.name}-{self.title}-{self.created_at_readable}'
-    
-class PostMedia(models.Model):
-    """
-        게시글 내 첨부된 Multi-media 관련 모델 (사진/영상)
-    """
-    post=models.ForeignKey(
-        Post,
-        on_delete=models.CASCADE # 포스트 삭제 시 삭제
-    )
-
-    url=models.URLField(
-        null=False,
-        blank=False
-    )
-
-    class Meta:
-        ordering=['post__created_at']
-        verbose_name='게시글 첨부 사진/영상'
-        verbose_name_plural='게시글 첨부 사진/영상들'
-
-    def __str__(self):
-        return f'{self.post.title}'
+        return f'{self.board.name}-{self.title}-{self.created_at_readable}-pending:{self.pending}'
     
 class UserPostProfile(models.Model):
     """
