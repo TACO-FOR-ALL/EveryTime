@@ -30,8 +30,7 @@ class Post(models.Model):
     # 작성자
     author=models.ForeignKey(
         User,
-        null=True,
-        on_delete=models.SET_NULL, # 유저 삭제 시, 작성자=NULL
+        on_delete=models.PROTECT,
     )
 
     # 게시판

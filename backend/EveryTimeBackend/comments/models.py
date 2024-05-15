@@ -13,8 +13,7 @@ class Comment(models.Model):
     # 작성자
     author=models.ForeignKey(
         User,
-        null=True,
-        on_delete=models.SET_NULL
+        on_delete=models.PROTECT
     )
 
     # 댓글을 단 게시글
