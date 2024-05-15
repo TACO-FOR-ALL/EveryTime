@@ -385,7 +385,7 @@ class boards_admin_view(LoginNeededView):
 
             return Response(
                 data=ResponseContent.success(
-                    data=is_admin
+                    data=is_admin,
                     data_field_name='is_admin'
                 )
             )
