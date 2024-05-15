@@ -31,6 +31,12 @@ class BaseBoard(models.Model):
     is_public=models.BooleanField(
         default=False
     )
+
+    # 게시판 관리자들
+    admins=models.ManyToManyField(
+        User,
+        blank=True
+    )
     
     class Meta:
         ordering=['created_at']
