@@ -43,7 +43,8 @@ class posts_get_view(LoginNeededView):
             obj_post = None
             try: # 해당 id의 post 검색
                 obj_post = Post.objects.get(id=post_id,
-                                            pending=False)
+                                            pending=False,
+                                            is_deleted=False)
             except:
                 return Response(
                     data=ResponseContent.fail('잘못된 postid!'),
@@ -208,7 +209,9 @@ class posts_upload_fail_view(LoginNeededView):
             
             obj_post=None # 목표 게시글
             try:
-                obj_post = Post.objects.get(id=post_id_to_use)
+                obj_post = Post.objects.get(id=post_id_to_use,
+                                            pending=False,
+                                            is_deleted=False)
             except:
                 return Response(
                     data=ResponseContent.fail('잘못된 postid'),

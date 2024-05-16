@@ -26,12 +26,14 @@ def get_board_post_by_num(board: BaseBoard,
         posts = Post.objects.filter(
             board=board,
             created_at__lte=last_seen_datetime,
-            pending=False
-            ).order_by('-created_at')[:num]
+            pending=False,
+            is_deleted=False
+        ).order_by('-created_at')[:num]
     else: # 최신 게시글
         posts = Post.objects.filter(
             board=board,
-            pending=False
+            pending=False,
+            is_deleted=False
         ).order_by('-created_at')[:num]
 
     return posts

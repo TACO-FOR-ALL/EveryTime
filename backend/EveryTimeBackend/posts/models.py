@@ -66,6 +66,11 @@ class Post(models.Model):
     @property
     def last_modified_readable(self):
         return localtime(self.last_modified).strftime("%Y-%m-%d %H:%M:%S")
+    
+    # 삭제 여부 (삭제한 후에도 기록은 남김, 하지만 댓글과 다르게 요청에 리턴하지 않음)
+    is_deleted = models.BooleanField(
+        default=False
+    )
 
     class Meta:
         ordering=['created_at']

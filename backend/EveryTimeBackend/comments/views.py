@@ -47,7 +47,8 @@ class comments_get_comments_view(LoginNeededView):
             obj_post = None
             try: # 해당 id의 post 검색
                 obj_post = Post.objects.get(id=post_id,
-                                            pending=False)
+                                            pending=False,
+                                            is_deleted=False)
             except:
                 return Response(
                     data=ResponseContent.fail('잘못된 postid!'),
@@ -199,7 +200,9 @@ class comments_upload_comment_view(LoginNeededView):
             
             obj_post=None
             try:
-                obj_post = Post.objects.get(id=post_id_to_use)
+                obj_post = Post.objects.get(id=post_id_to_use,
+                                            pending=False,
+                                            is_deleted=False)
             except:
                 return Response(
                     data=ResponseContent.fail('잘못된 post_id!'),
