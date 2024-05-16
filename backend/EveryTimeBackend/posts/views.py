@@ -143,7 +143,7 @@ class posts_upload_view(LoginNeededView):
                 )
             
             try:
-                with transaction.atomic(): # 게시글 object 생성 시도
+                with transaction.atomic(): # 게시글 object 생성
                     new_post = Post(
                         title=title_to_use,
                         content=content_to_use,
@@ -155,6 +155,11 @@ class posts_upload_view(LoginNeededView):
                     if file_num_to_use == 0: # 미디어 없음
                         new_post.pending=False # 대기 상태 해제, 바로 열람 가능
                     new_post.save() # 일단 저장
+
+                    # 게시글 프로필에 추가
+                    user_post_profile=UserPostProfile.objects.get(user=user)
+                    user_post_profile.posts.add(new_post)
+                    user_post_profile.save()
 
                     medias = [] # 업로드용 임시 url
                     if file_num_to_use >= 1: # 미디어 있음
@@ -215,6 +220,7 @@ class posts_upload_fail_view(LoginNeededView):
                     # TODO: 이미 업로드가 완료된 PostMedia를 OSS에서도 삭제할 것인지?
                     obj_post.delete()
                     # 관련 PostMedia Object 자동 삭제
+                    # 게시글 프로필에서 자동 삭제
 
                     return Response(
                         data=ResponseContent.success()

@@ -42,3 +42,10 @@ def CheckBoardPermission(user: User, board: BaseBoard) -> bool:
     
     # 에러
     raise Exception('게시판 권한 검사 중 알 수 없는 에러!')
+
+def CheckIfBoardAdmin(user: User,
+                      board: BaseBoard) -> bool:
+    """
+        유저 'user'가 게시판 'board'의 관리자인지 확인
+    """
+    return user in board.admins
