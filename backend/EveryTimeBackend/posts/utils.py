@@ -1,5 +1,3 @@
-from django.utils.dateparse import parse_datetime
-
 from boards.models import BaseBoard
 from posts.models import Post
 from medias.models import PostMedia
