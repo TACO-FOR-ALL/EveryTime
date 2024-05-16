@@ -3,12 +3,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.db import transaction
 
-from medias.models import PostMedia
 from medias.utils import get_media_upload_dict
 from boards.models import BaseBoard
 from boards.utils import CheckBoardPermission, CheckIfBoardAdmin
 from .models import *
-from .utils import get_post_media_download_urls
+from .utils import get_post_media_download_urls, check_post_if_with_media
 
 from EveryTimeBackend.utils import ResponseContent
 from EveryTimeBackend.view_template import LoginNeededView
@@ -20,8 +19,47 @@ class posts_realtime_best_view(LoginNeededView):
         기능: 실시간 베스트 게시글 목록 리턴
     """
     def get(self, request: Request):
-        raise NotImplementedError
-        # TODO
+        user=self.get_user(request)
+        try:
+            posts=Post.objects.filter(
+                pending=False,
+                is_deleted=False
+            ).order_by('views')\
+             .order_by('-created_time')[:5] # 먼저 조회수 순으로 정렬, 그리고 최신순으로 정렬
+            
+            result = []
+            for post in posts:
+                cur_dict = {
+                        "is_media": check_post_if_with_media,
+                        "title": post.title,
+                        "post_id": post.id,
+                        "board_name": post.board.name,
+                        "board_id": post.board.id,
+                        "nickname": "",
+                        "like_num": post.like_users.count(),
+                        "views": post.views,
+                        "created_at": post.created_at_readable
+                }
+                if not post.anonymous: # 비익명 게시글
+                    cur_dict['nickname']=post.author.nickname
+                if user == post.author: # 본인 게시글
+                    cur_dict['nickname']='나'
+                
+                result.append(cur_dict)
+            
+            return Response(
+                data=ResponseContent.success(
+                    data=result,
+                    data_field_name='posts'
+                )
+            )
+        except:
+            # TODO: LOGGING
+            return Response(
+                data=ResponseContent.fail('서버 에러!'),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
 
 class posts_get_view(LoginNeededView):
     """

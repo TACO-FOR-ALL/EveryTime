@@ -28,6 +28,7 @@ None
         "post_id": "string",
         "board_name": "string",
         "board_id": "string",
+        "nickname": "string",
         "like_num": int,
         "views": int,
         "created_at": "string"
@@ -44,9 +45,12 @@ None
 |posts-post_id|string|게시글 id|
 |posts-board_name|string|게시판 명칭|
 |posts-board_id|string|게시판 id|
+|posts-nickname|string|작성자 닉네임, 익명일 시 빈값, 본인 작성 게시글일 시 '나'|
 |posts-like_num|int|게시글 좋아요 갯수|
 |posts-views|int|게시글 조회수|
 |posts-created_at|string|게시글 등록 일자, 가독 포맷|
+
+**주의:** 시간순+조회수 순으로 최대 5개의 게시글만 리턴, 요청한 유저의 열람 권한이 없는 게시글도 포함될 수 있음, 베스트 게시글 목록에 제목만 노출
 
 ## 게시글내용요청
 
