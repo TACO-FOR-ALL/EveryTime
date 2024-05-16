@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from django.db import transaction
 
 from posts.models import Post
 from boards.utils import CheckBoardPermission
@@ -11,6 +12,7 @@ from .utils import (
     get_comments_of_post_by_num,
     get_num_of_reply_comment
 )
+from .models import Comment, UserCommentProfile
 
 from EveryTimeBackend.view_template import LoginNeededView
 from EveryTimeBackend.utils import ResponseContent
@@ -19,7 +21,7 @@ class comments_get_view(LoginNeededView):
     """
         Developer: Macchiato
         API: /comments/get/comments/?postid=<id>&timestamp=<timestamp>&num=<num>
-        기능: 특정 게시글에 해당되는 댓글 리턴
+        기능: 지정 게시글에 해당되는 댓글 리턴
     """
     def get(self, request: Request):
         user=self.get_user(request)
@@ -89,6 +91,145 @@ class comments_get_view(LoginNeededView):
                 # TODO: LOGGING
                 raise e
         except Exception as e:
+            # TODO: LOGGING
+            return Response(
+                data=ResponseContent.fail('서버 에러!'),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+class comments_upload_comment_view(LoginNeededView):
+    """
+        Developer: Macchiato
+        API: /comments/upload/comment
+        기능: 지정 게시글에 댓글 등록
+    """
+    def post(self, request: Request):
+        user=self.get_user(request)
+        try:
+            post_id_to_use = request.data.get('post_id', None)
+            content_to_use = request.data.get('content', None)
+
+            if not (post_id_to_use and content_to_use):
+                return Response(
+                    data=ResponseContent.fail('필수 파라미터 부재!'),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            obj_post=None
+            try:
+                obj_post = Post.objects.get(id=post_id_to_use)
+            except:
+                return Response(
+                    data=ResponseContent.fail('잘못된 post_id!'),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            if len(content_to_use) > 1024: # WARNING=BAD LOGIC
+                return Response(
+                    data=ResponseContent.fail('댓글 내용이 너무 깁니다!'),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            if not CheckBoardPermission(user, obj_post.board):
+                return Response(
+                    data=ResponseContent.fail('해당 게시판에 대한 권한이 없습니다!'),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            try:
+                with transaction.atomic():
+                    # 새로운 댓글 등록
+                    new_comment=Comment(
+                        author=user,
+                        post=obj_post,
+                        content=content_to_use
+                    )
+                    new_comment.save()
+
+                    # 댓글 프로필에 추가
+                    user_comment_profile=UserCommentProfile.objects.get(user=user)
+                    user_comment_profile.comments.add(new_comment)
+                    user_comment_profile.save()
+
+                    return Response(
+                        data=ResponseContent.success()
+                    )
+            except Exception as e:
+                # TODO: LOGGING
+                raise e
+
+        except:
+            # TODO: LOGGING
+            return Response(
+                data=ResponseContent.fail('서버 에러!'),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+class comments_upload_reply_view(LoginNeededView):
+    """
+        Developer: Macchiato
+        API: /comments/upload/reply
+        기능: 지정 댓글에 답글 등록
+    """
+    def post(self, request: Request):
+        user=self.get_user(request)
+        try:
+            comment_id_to_use = request.data.get('comment_id', None)
+            content_to_use = request.data.get('content', None)
+
+            if not (comment_id_to_use and content_to_use):
+                return Response(
+                    data=ResponseContent.fail('필수 파라미터 부재!'),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            obj_post=None
+            obj_comment=None
+            try:
+                obj_comment = Comment.objects.get(id=comment_id_to_use)
+                obj_post = obj_comment.post
+            except:
+                return Response(
+                    data=ResponseContent.fail('잘못된 comment_id!'),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            if len(content_to_use) > 1024: # WARNING=BAD LOGIC
+                return Response(
+                    data=ResponseContent.fail('댓글 내용이 너무 깁니다!'),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            if not CheckBoardPermission(user, obj_post.board):
+                return Response(
+                    data=ResponseContent.fail('해당 게시판에 대한 권한이 없습니다!'),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            try:
+                with transaction.atomic():
+                    # 새로운 답글 등록
+                    new_comment=Comment(
+                        author=user,
+                        post=obj_post,
+                        content=content_to_use,
+                        replying_to=obj_comment.id # 답글 id
+                    )
+                    new_comment.save()
+
+                    # 댓글 프로필에 추가
+                    user_comment_profile=UserCommentProfile.objects.get(user=user)
+                    user_comment_profile.comments.add(new_comment)
+                    user_comment_profile.save()
+
+                    return Response(
+                        data=ResponseContent.success()
+                    )
+            except Exception as e:
+                # TODO: LOGGING
+                raise e
+
+        except:
             # TODO: LOGGING
             return Response(
                 data=ResponseContent.fail('서버 에러!'),

@@ -64,10 +64,8 @@ class Comment(models.Model):
         verbose_name_plural='댓글들'
 
     def __str__(self):
-        if self.author:
-            return f'{self.author.username}-{self.post.title}-like:{str(len(self.like_users.all()))}'
-        else:
-            return f'NULL-{self.post.title}-like:{str(len(self.like_users.all()))}'
+        return f'{self.author.username}-{self.post.title}-like:{str(len(self.like_users.all()))}'
+        
         
 class UserCommentProfile(models.Model):
     """

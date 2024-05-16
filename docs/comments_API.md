@@ -4,6 +4,8 @@
 - [COMMENTS-API 목록](#comments-api-목록)
   - [특정게시글내댓글요청](#특정게시글내댓글요청)
   - [특정댓글의답글요청](#특정댓글의답글요청)
+  - [게시글댓글작성](#게시글댓글작성)
+  - [댓글답글작성](#댓글답글작성)
 
 >***LOGIN_NEEDED***
 
@@ -92,3 +94,43 @@ None
 |comments-likes|int|답글이 받은 좋아요 갯수|
 |comments-reply_num|string|해당 답글에 달린 답글 수량, 답글 없을 시 0|
 |comments-is_deleted|bool|삭제 여부, 삭제 시 True|
+
+## 게시글댓글작성
+
+>***LOGIN_NEEDED***
+
+- **URL**: `/comments/upload/comment`
+- **METHOD**: `POST`
+- **REOUEST PAYLOAD**:
+```json
+{
+  "post_id": "string",
+  "content": "string"
+}
+```
+|이름|타입|설명|
+| - | - | - |
+|post_id|string|댓글을 작성하고자 하는 게시글 id|
+|content|string|댓글 내용 (렌더링에 필요한 양식 그대로)|
+
+- **RESPONSE PAYLOAD**: **기본 형식**
+
+## 댓글답글작성
+
+>***LOGIN_NEEDED***
+
+- **URL**: `/comments/upload/reply`
+- **METHOD**: `POST`
+- **REOUEST PAYLOAD**:
+```json
+{
+  "comment_id": "string",
+  "content": "string"
+}
+```
+|이름|타입|설명|
+| - | - | - |
+|comment_id|string|답글을 작성하고자 하는 댓글 id|
+|content|string|답글 내용 (렌더링에 필요한 양식 그대로)|
+
+- **RESPONSE PAYLOAD**: **기본 형식**
