@@ -8,7 +8,8 @@ class CommentAdmin(admin.ModelAdmin):
         'get_author_username',
         'get_author_nickname',
         'get_content_preview',
-        'created_at'
+        'created_at',
+        'get_like_num'
     ]
     search_fields = [
         'post__title',
@@ -31,5 +32,8 @@ class CommentAdmin(admin.ModelAdmin):
 
     def get_post_title(self, obj):
         return obj.post.title
+    
+    def get_like_num(self, obj):
+        return obj.like_users.count()
     
 admin.site.register(Comment, CommentAdmin)

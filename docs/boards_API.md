@@ -134,7 +134,8 @@ None
         "timestamp": "string",
         "created_at": "string",
         "author_nickname": "string",
-        "like_num": int
+        "like_num": int,
+        "views": int
       }
     ]
 }
@@ -151,6 +152,7 @@ None
 |posts-created_at|string|게시글 등록 시간, 가독 format|
 |posts-author_nickname|string|게시글 작성자 노출명, 익명 게시글인 경우 빈값, 본인 게시글인 경우 '나'|
 |posts-like_num|int|게시글 좋아요 갯수|
+|posts-views|int|게시글 조회수|
 
 ## 게시판관리자권한확인요청
 

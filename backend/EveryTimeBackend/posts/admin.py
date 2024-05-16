@@ -7,9 +7,12 @@ class PostAdmin(admin.ModelAdmin):
         'title',
         'get_author_username',
         'get_author_nickname',
+        'get_like_num',
+        'views',
         'created_at',
         'last_modified',
-        'pending'
+        'pending',
+        'is_deleted'
     ]
     search_fields=[
         'board__name',
@@ -29,5 +32,8 @@ class PostAdmin(admin.ModelAdmin):
     def get_board_name(self, obj):
         return obj.board.name
     get_board_name.short_description = 'Board Name'
+
+    def get_like_num(self, obj):
+        return obj.like_users.count()
 
 admin.site.register(Post, PostAdmin)

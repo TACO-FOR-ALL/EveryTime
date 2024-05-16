@@ -322,7 +322,8 @@ class boards_get_posts_view(LoginNeededView):
                             "board_name": post.board.name,
                             "board_id": post.board.id,
                             "timestamp": post.created_at.timestamp(),
-                            "created_at": post.created_at_readable
+                            "created_at": post.created_at_readable,
+                            "views": post.views
                         })
                             
                     if len(post_result) >= num: # 위의 for에서 num을 초과해서 채웠을 경우 num만큼 짜르고 break
