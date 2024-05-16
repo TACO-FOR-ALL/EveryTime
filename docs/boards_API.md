@@ -133,7 +133,8 @@ None
         "board_id": "string",
         "timestamp": "string",
         "created_at": "string",
-        "author_nickname": "string"
+        "author_nickname": "string",
+        "like_num": int
       }
     ]
 }
@@ -149,6 +150,7 @@ None
 |posts-timestamp|string|게시글의 timestamp, Pagination에 사용|
 |posts-created_at|string|게시글 등록 시간, 가독 format|
 |posts-author_nickname|string|게시글 작성자 노출명, 익명 게시글인 경우 빈값, 본인 게시글인 경우 '나'|
+|posts-like_num|int|게시글 좋아요 갯수|
 
 ## 게시판관리자권한확인요청
 

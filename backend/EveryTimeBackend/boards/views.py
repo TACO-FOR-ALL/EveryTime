@@ -285,7 +285,8 @@ class boards_get_posts_view(LoginNeededView):
                             "board_id": post.board.id,
                             "timestamp": post.created_at.timestamp(),
                             "created_at": post.created_at_readable,
-                            "author_nickname": ''
+                            "author_nickname": '',
+                            "like_num": post.like_users.count()
                         }
                         # 비익명 게시글
                         if not post.anonymous:

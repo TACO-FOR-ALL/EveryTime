@@ -6,7 +6,7 @@ from django.db import transaction
 from medias.models import PostMedia
 from medias.utils import get_media_upload_dict
 from boards.models import BaseBoard
-from boards.utils import CheckBoardPermission
+from boards.utils import CheckBoardPermission, CheckIfBoardAdmin
 from .models import *
 from .utils import get_post_media_download_urls
 
@@ -65,7 +65,8 @@ class posts_get_view(LoginNeededView):
                     'board_name': obj_post.board.name,
                     'board_id':obj_post.board.id,
                     'created_at':obj_post.created_at_readable,
-                    'nickname': ''
+                    'nickname': '',
+                    'like_num': obj_post.like_users.count()
                 }
 
                 # 비익명 게시글일 시
@@ -228,6 +229,113 @@ class posts_upload_fail_view(LoginNeededView):
                     return Response(
                         data=ResponseContent.success()
                     )
+            except Exception as e:
+                # TODO: LOGGING
+                raise e
+
+        except:
+            # TODO: LOGGING
+            return Response(
+                data=ResponseContent.fail('서버 에러!'),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        
+class posts_like_view(LoginNeededView):
+    """
+        Developer: Macchiato
+        API: /posts/like/?postid=<post_id>&like=<like>
+        기능: 지정 게시글 좋아요 설정/해제
+    """
+    def get(self, request: Request):
+        user=self.get_user(request)
+        try:
+            post_id_to_use = request.query_params.get('postid', None)
+            like_status = request.query_params.get('like', None)
+
+            if not (post_id_to_use and like_status):
+                return Response(
+                    data=ResponseContent.fail('필수 파라미터 부재!'),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            like_status = int(like_status)
+            if like_status != 1 and like_status != 0:
+                return Response(
+                    data=ResponseContent.fail(f'잘못된 like: {str(like_status)}'),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            obj_post=None
+            try:
+                obj_post = Post.objects.get(id=post_id_to_use,
+                                            pending=False,
+                                            is_deleted=False)
+            except Exception as e:
+                return Response(
+                    data=ResponseContent.fail('잘못된 postid!'),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            try:
+                with transaction.atomic():
+                    if like_status: # 좋아요 설정
+                        obj_post.like_users.add(user)
+                    else: # 해제
+                        obj_post.like_users.delete(user)
+                    obj_post.save()
+            except Exception as e:
+                # TODO: LOGGING
+                raise e
+        except:
+            # TODO: LOGGING
+            return Response(
+                data=ResponseContent.fail('서버 에러!'),
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+
+
+class posts_delete_view(LoginNeededView):
+    """
+        Developer: Macchiato
+        API: /posts/delete/?postid=<post_id>
+        기능: 지정 게시글 삭제 (본인 또는 게시판 관리자)
+    """
+    def get(self, request: Request):
+        user=self.get_user(request)
+        try:
+            post_id_to_use = request.query_params.get('posttid', None)
+
+            if post_id_to_use is None:
+                return Response(
+                data=ResponseContent.fail('필수 파라미터 부재: postid!'),
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+            obj_post=None
+            try:
+                obj_post=Post.objects.get(id=post_id_to_use,
+                                          pending=False,
+                                          is_deleted=False)
+            except:
+                return Response(
+                data=ResponseContent.fail(f'잘못된 postid={post_id_to_use}'),
+                status=status.HTTP_400_BAD_REQUEST
+            )
+            
+            try:
+                if user == obj_post.author or CheckIfBoardAdmin(user=user, board=obj_post.board):
+                    # 본인 게시글 또는 해당 게시판 관리자인 경우에만 삭제 가능
+                    with transaction.atomic():
+                        obj_post.is_deleted=True
+                        obj_post.save()
+                        return Response(
+                            data=ResponseContent.success()
+                        )
+                else: # 권한 없음
+                    return Response(
+                        data=ResponseContent.fail(f'해당 게시글에 대한 권한이 없습니다!'),
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+                        
             except Exception as e:
                 # TODO: LOGGING
                 raise e

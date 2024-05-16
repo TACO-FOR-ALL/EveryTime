@@ -5,6 +5,8 @@
   - [게시글내용요청](#게시글내용요청)
   - [게시글업로드](#게시글업로드)
   - [게시글업로드실패고지](#게시글업로드실패고지)
+  - [게시글좋아요/좋아요해제](#게시글좋아요좋아요해제)
+  - [게시글삭제](#게시글삭제)
 
 ## 실시간베스트게시글목록
 
@@ -24,7 +26,10 @@ None
         "is_media": bool,
         "title": "string",
         "post_id": "string",
-        "board_name": "string"
+        "board_name": "string",
+        "board_id": "string",
+        "like_num": int,
+        "created_at": "string"
       }
     ]
 }
@@ -37,6 +42,9 @@ None
 |posts-title|string|게시글 제목|
 |posts-post_id|string|게시글 id|
 |posts-board_name|string|게시판 명칭|
+|posts-board_id|string|게시판 id|
+|posts-like_num|int|게시글 좋아요 갯수|
+|posts-created_at|string|게시글 등록 일자, 가독 포맷|
 
 ## 게시글내용요청
 
@@ -54,8 +62,7 @@ None
 - **RESPONSE PAYLOAD**:
 ```json
 {
-    "post": [
-      {
+    "post": {
         "media_urls":[
           "string",
           ...
@@ -64,9 +71,9 @@ None
         "board_name": "string",
         "board_id": "string",
         "created_at": "string",
-        "nickname": "string"
+        "nickname": "string",
+        "like_num": int
       }
-    ]
 }
 ```
 |이름|타입|설명|
@@ -77,6 +84,7 @@ None
 |posts-board_id|string|게시판 id|
 |posts-created_at|string|게시글 등록 시간(가독 format)|
 |posts-nickname|string|게시글 작성자 노출명 nickname, 익명 게시글인 경우 빈값, 본인 게시글인 경우 '나'|
+|posts-like_num|int|게시글 좋아요 갯수|
 
 
 ## 게시글업로드
@@ -147,5 +155,40 @@ None
 |이름|타입|설명|
 | - | - | - |
 |postid|string|관련 미디어 업로드에 실패한 게시글 id|
+
+- **RESPONSE PAYLOAD**: **기본 형식**
+
+## 게시글좋아요/좋아요해제
+
+>***LOGIN_NEEDED***
+
+- **URL**: `/posts/like/?postid=<post_id>&like=<like>`
+- **METHOD**: `GET`
+- **REQUEST PAYLOAD**:
+```json
+None
+```
+|이름|타입|설명|
+| - | - | - |
+|postid|string|좋아요 설정/해제를 할 게시글 id|
+|like|int|좋아요 설정 시 1, 해제 시 0|
+
+- **RESPONSE PAYLOAD**: **기본 형식**
+
+## 게시글삭제
+
+>***LOGIN_NEEDED***
+
+- **URL**: `/posts/delete/?postid=<post_id>`
+- **METHOD**: `GET`
+- **REQUEST PAYLOAD**:
+```json
+None
+```
+|이름|타입|설명|
+| - | - | - |
+|postid|string|삭제할 게시글 id|
+
+**주의:** 본인 게시글 또는 해당 게시판 관리자만 요청 가능
 
 - **RESPONSE PAYLOAD**: **기본 형식**

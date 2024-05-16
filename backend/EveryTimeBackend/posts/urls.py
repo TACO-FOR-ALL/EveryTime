@@ -22,4 +22,13 @@ urlpatterns = [
     path("upload/fail", # 게시글 업로드 실패 고지
          views.posts_upload_fail_view.as_view(),
          name='posts.upload.fail'),
+
+     path("like/", # 게시글 좋아요 설정/해제
+         views.posts_like_view.as_view(),
+         name='posts.like'),
+
+     path("delete/", # 게시글 삭제
+         views.posts_delete_view.as_view(),
+         name='posts.delete'),
+
 ]

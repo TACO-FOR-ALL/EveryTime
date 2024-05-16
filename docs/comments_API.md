@@ -33,8 +33,9 @@ None
         "content": "string",
         "timestamp": "string",
         "created_at": "string",
-        "reply_num": "int",
-        "is_deleted": bool
+        "reply_num": int,
+        "is_deleted": bool,
+        "like_num": int,
       }
     ]
 }
@@ -50,6 +51,7 @@ None
 |comments-likes|int|댓글이 받은 좋아요 갯수|
 |comments-reply_num|string|해당 댓글에 달린 답글 수량, 답글 없을 시 0|
 |comments-is_deleted|bool|삭제 여부, 삭제 시 True|
+|comments-like_num|int|댓글 좋아요 갯수|
 
 **주의**: 게시글에 대한 직접적인 댓글만 리턴, 각 댓글에 대한 답글은 [해당 API](#특정댓글의답글요청) 활용 요망
 
@@ -79,8 +81,9 @@ None
         "content": "string",
         "timestamp": "string",
         "created_at": "string",
-        "reply_num": "int",
-        "is_deleted": bool
+        "reply_num": int,
+        "is_deleted": bool,
+        "like_num": int
       }
     ]
 }
@@ -96,6 +99,7 @@ None
 |comments-likes|int|답글이 받은 좋아요 갯수|
 |comments-reply_num|string|해당 답글에 달린 답글 수량, 답글 없을 시 0|
 |comments-is_deleted|bool|삭제 여부, 삭제 시 True|
+|comments-like_num|int|답글 좋아요 갯수|
 
 ## 게시글댓글작성
 

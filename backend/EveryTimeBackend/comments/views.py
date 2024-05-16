@@ -81,7 +81,8 @@ class comments_get_comments_view(LoginNeededView):
                         'timestamp': comment.created_at.timestamp(),
                         'created_at': comment.created_at_readable,
                         'reply_num': get_num_of_reply_comment(comment), # 해당 댓글에 대한 답글 갯수 획득
-                        'is_deleted': comment.is_deleted
+                        'is_deleted': comment.is_deleted,
+                        'like_num': comment.like_users.count()
                     }
                     result.append(cur_dict)
 
@@ -160,7 +161,8 @@ class comments_get_reply_view(LoginNeededView):
                         'timestamp': comment.created_at.timestamp(),
                         'created_at': comment.created_at_readable,
                         'reply_num': get_num_of_reply_comment(comment), # 해당 댓글에 대한 답글 갯수 획득
-                        'is_deleted': comment.is_deleted
+                        'is_deleted': comment.is_deleted,
+                        'like_num': comment.like_users.count()
                     }
                     result.append(cur_dict)
 

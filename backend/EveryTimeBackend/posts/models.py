@@ -72,6 +72,12 @@ class Post(models.Model):
         default=False
     )
 
+    like_users=models.ManyToManyField(
+        User,
+        blank=True,
+        related_name='liked_posts'
+    )
+
     class Meta:
         ordering=['created_at']
         verbose_name='게시글'
