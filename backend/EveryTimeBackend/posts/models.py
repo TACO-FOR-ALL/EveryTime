@@ -78,13 +78,18 @@ class Post(models.Model):
         related_name='liked_posts'
     )
 
+    # 조회수
+    views=models.PositiveIntegerField(
+        default=0
+    )
+
     class Meta:
         ordering=['created_at']
         verbose_name='게시글'
         verbose_name_plural='게시글들'
 
     def __str__(self):
-        return f'{self.board.name}-{self.title}-{self.created_at_readable}-pending:{self.pending}'
+        return f'{self.board.name}-{self.title}-pending:{self.pending}-deleted:{self.is_deleted}-{self.created_at_readable}'
     
 class UserPostProfile(models.Model):
     """

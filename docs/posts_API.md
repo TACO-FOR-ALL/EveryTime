@@ -29,6 +29,7 @@ None
         "board_name": "string",
         "board_id": "string",
         "like_num": int,
+        "views": int,
         "created_at": "string"
       }
     ]
@@ -44,6 +45,7 @@ None
 |posts-board_name|string|게시판 명칭|
 |posts-board_id|string|게시판 id|
 |posts-like_num|int|게시글 좋아요 갯수|
+|posts-views|int|게시글 조회수|
 |posts-created_at|string|게시글 등록 일자, 가독 포맷|
 
 ## 게시글내용요청
@@ -72,7 +74,8 @@ None
         "board_id": "string",
         "created_at": "string",
         "nickname": "string",
-        "like_num": int
+        "like_num": int,
+        "views": int
       }
 }
 ```
@@ -85,6 +88,7 @@ None
 |posts-created_at|string|게시글 등록 시간(가독 format)|
 |posts-nickname|string|게시글 작성자 노출명 nickname, 익명 게시글인 경우 빈값, 본인 게시글인 경우 '나'|
 |posts-like_num|int|게시글 좋아요 갯수|
+|posts-views|int|게시글 조회수|
 
 
 ## 게시글업로드

@@ -66,7 +66,8 @@ class posts_get_view(LoginNeededView):
                     'board_id':obj_post.board.id,
                     'created_at':obj_post.created_at_readable,
                     'nickname': '',
-                    'like_num': obj_post.like_users.count()
+                    'like_num': obj_post.like_users.count(),
+                    'views': obj_post.views
                 }
 
                 # 비익명 게시글일 시
