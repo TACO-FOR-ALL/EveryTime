@@ -1,33 +1,32 @@
-from typing import Tuple
-from django.core.mail import send_mail
-from django.core.mail import BadHeaderError
-from django.conf import settings
-from EveryTimeBackend.mail_templates import *
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from mail_templates import get_html_content
+import mail_config
 
-def send_auth_email(email_address: str, content: str, type: int) -> Tuple:
-    """
-        Developer:
-        기능: 인증용 이메일을 전송하고 전송 결과를 Tuple로 리턴: True, None: 성공 / False, str: 실패
-        Type: 1 - 가입 인증; 2 - 비밀번호 리셋
-    """ 
+class EmailConfig:
+    def __init__(self):
+        self.smtp_server = mail_config.smtp_server
+        self.smtp_port = mail_config.smtp_port
+        self.sender_email = mail_config.sender_email
+        self.password = mail_config.password
+
+def send_auth_email(receiver_email, content):
+    config = EmailConfig()
+    
+    msg = MIMEMultipart()
+    msg['From'] = config.sender_email
+    msg['To'] = receiver_email
+    msg['Subject'] = "북경 커뮤니티 회원가입 인증 안내"
+    
+    html = get_html_content(content)
+    msg.attach(MIMEText(html, 'html'))
+    
     try:
-        subject_template=''
-        message_template=''
-        if type == 1: # 가입 인증
-            subject_template = SIGNUP_SUBJECT
-            message_template = SIGNUP_MESSAGE
-        elif type == 2: # 비밀번호 리셋 인증
-            subject_template = PW_RESET_SUBJECT
-            message_template = PW_RESET_MESSAGE
-        else: # Unknown Type
-            return (False, "실패, Unknown auth type!")
-
-        send_mail(subject=subject_template,
-                  message=message_template.format(content=content),
-                  from_email=settings.MAIL['default']['EMAIL_HOST_USER'], # TODO: 추후 수정이 필요할 것으로 보임
-                  recipient_list=[email_address])
-        return (True, None)
-    except BadHeaderError:
-        return (False, "실패, BadHeaderError!")
+        smtp = smtplib.SMTP_SSL(config.smtp_server, config.smtp_port)
+        smtp.login(config.sender_email, config.password)
+        smtp.sendmail(config.sender_email, receiver_email, msg.as_string())
+        smtp.quit()
+        print("이메일이 성공적으로 발송되었습니다.")
     except Exception as e:
-        return (False, str(e))
+        print(f"이메일 발송 실패: {e}")
