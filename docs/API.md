@@ -21,5 +21,6 @@
 3. `status`에 포함되는 `status_code`는 다음과 같음.
     - 0: 성공
     - 1: 실패 (`error_msg` 제공)
-    - 2: jwt 인증 실패 (`error_msg` 제공)
+    - 2: jwt 토큰 미제공 (`error_msg` 제공)
+    - 3: jwt access token 만료 또는 식별 불가 token (`error_msg` 제공)
 4. 로그인 필요 서비스 (request.head.authorization에 jwt토큰 첨부 필요)는 ***LOGIN_NEEDED*** 표시

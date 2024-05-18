@@ -12,7 +12,6 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 from .database_config import DATABASES
-from .mail_config import MAIL
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -133,7 +132,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication', # jwt인증
     ],
-    'EXCEPTION_HANDLER': 'everytimebackend.exception_handler.custom_exception_handler',
+    'EXCEPTION_HANDLER': 'users.exception_handler.custom_exception_handler', # jwt인증 오류 handler
 }
 
 from datetime import timedelta

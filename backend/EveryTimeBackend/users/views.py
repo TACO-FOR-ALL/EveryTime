@@ -8,10 +8,8 @@ from rest_framework_simplejwt.views import TokenRefreshView
 from django.db import transaction
 from django.contrib.auth import authenticate
 from .models import *
-from .serializers import *
-from .utils import *
 
-from EveryTimeBackend.utils import ResponseContent, generate_auth_code
+from EveryTimeBackend.utils import ResponseContent, generate_auth_code, send_auth_email
 from EveryTimeBackend.view_template import LoginNeededView
     
 class CustomTokenRefreshView(TokenRefreshView):
@@ -40,9 +38,20 @@ class users_organization_list_view(APIView):
     def get(self, request: Request):
         try:
             organizations = Organization.objects.all()
-            serializer = OrganizationSerializer(organizations, many=True)
-            return Response(data=ResponseContent.success(data=serializer.data,
-                                                         data_field_name='organizations'))
+            result = []
+            for org in organizations:
+                cur_dict = {
+                    "name": org.name,
+                    "id": org.id,
+                    "region": org.region.name
+                }
+                result.append(cur_dict)
+            return Response(
+                data=ResponseContent.success(
+                    data=result,
+                    data_field_name="organizations"
+                )
+            )
         except Exception as e: # 서버 에러
             # TODO: LOGGING
             return Response(
@@ -77,9 +86,8 @@ class users_organization_mails_view(APIView):
             
             # 해당 학교/단체 email suffix query
             org_emails = OrganizationEmail.objects.filter(organization=obj_org).all()
-            email_serializer = OrganizationEmailListSerializer(org_emails,
-                                                               many=True)
-            return Response(data=ResponseContent.success(data=email_serializer.data,
+            result = [e.suffix for e in org_emails]
+            return Response(data=ResponseContent.success(data=result,
                                                          data_field_name='emails'))
 
         except Exception as e: # 서버 에러
@@ -133,7 +141,7 @@ class users_organization_send_auth_email_view(APIView):
 
             # 메일 발송
             cur_auth_code = generate_auth_code()
-            send_result, fail_reason = send_auth_email(email_address=email_to_use,
+            send_result, fail_reason = send_auth_email(receiver_email=email_to_use,
                                                        content=cur_auth_code,
                                                        type=1)
             
@@ -280,7 +288,8 @@ class users_signup_view(APIView):
                     new_user = User(
                         username=username_to_use,
                         email=email_to_use,
-                        organization=obj_org
+                        organization=obj_org,
+                        nickname=nickname_to_use
                     )
                     new_user.set_password(password_to_use)
                     new_user.save()
@@ -364,7 +373,7 @@ class users_reset_password_send_auth_email_view(APIView):
                 )
             
             cur_auth_code = generate_auth_code()
-            send_result, fail_reason = send_auth_email(email_address=email_to_use,
+            send_result, fail_reason = send_auth_email(receiver_email=email_to_use,
                                                        content=cur_auth_code,
                                                        type=2)
             
