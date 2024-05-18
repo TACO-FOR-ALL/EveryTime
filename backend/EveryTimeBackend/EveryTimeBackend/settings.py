@@ -10,6 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
+import sys
+from loguru import logger
 from pathlib import Path
 from .database_config import DATABASES
 
@@ -135,8 +137,33 @@ REST_FRAMEWORK = {
     'EXCEPTION_HANDLER': 'users.exception_handler.custom_exception_handler', # jwt인증 오류 handler
 }
 
-from datetime import timedelta
-
 SIMPLE_JWT = {
     'BLACKLIST_AFTER_ROTATION': True
 }
+
+def custom_record(record):
+    # Extracting necessary information from the record
+    level = record["level"].name
+    time = record["time"]
+    message = record["message"]
+    # Extracting method name if available
+    method_name = record["function"] if "function" in record else ""
+    # Returning the formatted string
+    return f"{time} - {level} - [{method_name}] {message}\n"
+
+LOGURU_CONFIG = {
+    "handlers": [
+        { # file
+            "sink": "../logs/backend.log",
+            "level": "DEBUG",
+            "format": custom_record,
+            "colorize": True,
+            "rotation": "50MB",
+            "enqueue": True
+        }
+    ]
+}
+
+logger.remove(handler_id=None)
+for handler in LOGURU_CONFIG['handlers']:
+    logger.add(**handler)

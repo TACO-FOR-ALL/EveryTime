@@ -84,5 +84,4 @@ def send_auth_email(receiver_email: str,
         
         return True, ''
     except Exception as e: # 발송 실패
-        # TODO: LOGGING
         return False, str(e)

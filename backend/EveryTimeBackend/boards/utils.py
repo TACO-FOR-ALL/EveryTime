@@ -1,6 +1,13 @@
 from .models import *
 from users.models import User, UserProfile
 
+def CheckIfBoardAdmin(user: User,
+                      board: BaseBoard) -> bool:
+    """
+        유저 'user'가 게시판 'board'의 관리자인지 확인
+    """
+    return user in board.admins.all()
+
 def CheckBoardPermission(user: User, board: BaseBoard) -> bool:
     """
         유저의 관련 게시판 열람 권한 확인
@@ -12,6 +19,9 @@ def CheckBoardPermission(user: User, board: BaseBoard) -> bool:
     
     # organizaiton=None인 경우, 전체 관리자
     if user.organization is None:
+        return True
+    
+    if CheckIfBoardAdmin(user, board): # 게시판 관리자
         return True
 
     # 전체 공개x
@@ -32,7 +42,7 @@ def CheckBoardPermission(user: User, board: BaseBoard) -> bool:
     
     if isinstance(board, ClubBoard):
         user_profile = UserProfile.objects.get(user=user)
-        for club in user_profile.clubs:
+        for club in user_profile.clubs.all():
             if club == ClubBoard.club: # 해당 동아리 소속
                 return True
         if board.is_public_to_region \
@@ -42,10 +52,3 @@ def CheckBoardPermission(user: User, board: BaseBoard) -> bool:
     
     # 에러
     raise Exception('게시판 권한 검사 중 알 수 없는 에러!')
-
-def CheckIfBoardAdmin(user: User,
-                      board: BaseBoard) -> bool:
-    """
-        유저 'user'가 게시판 'board'의 관리자인지 확인
-    """
-    return user in board.admins

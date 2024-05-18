@@ -19,6 +19,7 @@ from EveryTimeBackend.view_template import LoginNeededView
 from EveryTimeBackend.utils import ResponseContent
 
 from typing import List
+from loguru import logger
 
 class comments_get_comments_view(LoginNeededView):
     """
@@ -93,10 +94,13 @@ class comments_get_comments_view(LoginNeededView):
                     )
                 )
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Error at comments pagination")
+                logger.debug("Post ID: " + str(obj_post.id))
                 raise e
         except Exception as e:
-            # TODO: LOGGING
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail('서버 에러!'),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -173,10 +177,13 @@ class comments_get_reply_view(LoginNeededView):
                     )
                 )
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Error at comment reply pagination")
+                logger.debug("comment id: " + str(obj_comment.id))
                 raise e
         except Exception as e:
-            # TODO: LOGGING
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail('서버 에러!'),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -242,11 +249,14 @@ class comments_upload_comment_view(LoginNeededView):
                         data=ResponseContent.success()
                     )
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Error at new comment save")
+                logger.debug("Post id: " + str(obj_post.id))
                 raise e
 
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail('서버 에러!'),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -313,11 +323,14 @@ class comments_upload_reply_view(LoginNeededView):
                         data=ResponseContent.success()
                     )
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Error at new reply comment save")
+                logger.debug("Post id: " + str(obj_post.id))
                 raise e
 
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail('서버 에러!'),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -364,11 +377,14 @@ class comments_like(LoginNeededView):
                         obj_comment.like_users.delete(user)
                     obj_comment.save()
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Error at like_status set and save")
+                logger.debug("comment id: " + str(obj_comment.id))
                 raise e
             
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail('서버 에러!'),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -400,8 +416,9 @@ class comments_delete(LoginNeededView):
                 status=status.HTTP_400_BAD_REQUEST
             )
             
-            try:
-                if user == obj_comment.author or CheckIfBoardAdmin(user=user, board=obj_comment.post.board):
+            if user == obj_comment.author or CheckIfBoardAdmin(user=user, board=obj_comment.post.board):
+                try:
+                    
                     # 본인 댓글 또는 해당 게시판 관리자인 경우에만 삭제 가능
                     with transaction.atomic():
                         obj_comment.is_deleted=True
@@ -409,18 +426,20 @@ class comments_delete(LoginNeededView):
                         return Response(
                             data=ResponseContent.success()
                         )
-                else: # 권한 없음
-                    return Response(
-                        data=ResponseContent.fail(f'해당 댓글에 대한 권한이 없습니다!'),
-                        status=status.HTTP_400_BAD_REQUEST
-                    )
-                        
-            except Exception as e:
-                # TODO: LOGGING
-                raise e
+                except Exception as e:
+                    logger.debug("Error at comment delete")
+                    logger.debug("comment id: " + str(obj_comment.id))
+                    raise e
+            else: # 권한 없음
+                return Response(
+                    data=ResponseContent.fail(f'해당 댓글에 대한 권한이 없습니다!'),
+                    status=status.HTTP_400_BAD_REQUEST
+                )
 
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail('서버 에러!'),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR

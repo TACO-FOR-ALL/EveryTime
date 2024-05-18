@@ -10,6 +10,8 @@ from .utils import CheckBoardPermission
 from EveryTimeBackend.view_template import LoginNeededView
 from EveryTimeBackend.utils import ResponseContent
 
+from loguru import logger
+
 class boards_get_main_board_view(LoginNeededView):
     """
         Developer: Macchiato
@@ -37,8 +39,10 @@ class boards_get_main_board_view(LoginNeededView):
                 )
             )
                                     
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.error("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -57,7 +61,7 @@ class boards_get_bookmark_boards_view(LoginNeededView):
             user_board_profile = UserBoardProfile.objects.get(user=user)
             favorite_boards = user_board_profile.favorite_boards.all()
             favorite_board_info_list = []
-            for fboard in favorite_boards:
+            for fboard in favorite_boards.all():
                 fboard_info_dict = {
                     "board_name": fboard.name,
                     "board_name": fboard.id
@@ -71,8 +75,10 @@ class boards_get_bookmark_boards_view(LoginNeededView):
                 )
             )
         
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.error("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -89,15 +95,25 @@ class boards_set_main_board_view(LoginNeededView):
         try:
             user_board_profile = UserBoardProfile.objects.get(user=user)
             new_main_board_info = {}
-            new_main_board_id = 0
-            new_main_is_delete = False
+            new_main_board_id = None
+            new_main_is_delete = None
 
             try:
                 new_main_board_info = request.data.get('main_board')
                 if new_main_board_info is None:
+                    logger.debug("Error at:" + self.__class__.__name__)
+                    logger.debug('main_board is None')
                     raise KeyError
                 new_main_board_id = new_main_board_info['board_id']
                 new_main_is_delete = new_main_board_info['is_delete']
+                if new_main_board_id is None:
+                    logger.debug("Error at:" + self.__class__.__name__)
+                    logger.debug("board_id is None")
+                    raise KeyError
+                if new_main_is_delete is None:
+                    logger.debug("Error at:" + self.__class__.__name__)
+                    logger.debug("is_delete is None")
+                    raise KeyError
             except KeyError:
                 return Response(
                 data=ResponseContent.fail('잘못된 요청 파라미터!'),
@@ -113,7 +129,7 @@ class boards_set_main_board_view(LoginNeededView):
                         data=ResponseContent.success()
                     )
                 except Exception as e:
-                    # TODO: LOGGING
+                    logger.debug("Delete Erorr")
                     raise e
 
             # 설정/변경 조작
@@ -140,11 +156,13 @@ class boards_set_main_board_view(LoginNeededView):
                         data=ResponseContent.success()
                     )
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("user_board_profile.save() error")
                 raise e
 
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -168,9 +186,19 @@ class boards_set_bookmark_boards_view(LoginNeededView):
             try:
                 new_fav_board_info = request.data.get('favorite_board')
                 if new_fav_board_info is None:
+                    logger.debug("Error at:" + self.__class__.__name__)
+                    logger.debug('main_board is None')
                     raise KeyError
                 new_fav_board_id = new_fav_board_info['board_id']
                 new_fav_is_delete = new_fav_board_info['is_delete']
+                if new_fav_board_id is None:
+                    logger.debug("Error at:" + self.__class__.__name__)
+                    logger.debug("board_id is None")
+                    raise KeyError
+                if new_fav_is_delete is None:
+                    logger.debug("Error at:" + self.__class__.__name__)
+                    logger.debug("is_delete is None")
+                    raise KeyError
             except KeyError:
                 return Response(
                 data=ResponseContent.fail('잘못된 요청 파라미터!'),
@@ -188,7 +216,7 @@ class boards_set_bookmark_boards_view(LoginNeededView):
                             data=ResponseContent.success()
                         )
                 except Exception as e:
-                    # TODO: LOGGING
+                    logger.debug("Error at user_board_profile.save()")
                     raise e
 
             # 설정 조작
@@ -214,11 +242,13 @@ class boards_set_bookmark_boards_view(LoginNeededView):
                         data=ResponseContent.success()
                     )
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Eror at user_board_profile.save()")
                 raise e
 
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -267,7 +297,6 @@ class boards_get_posts_view(LoginNeededView):
                         status=status.HTTP_400_BAD_REQUEST
                     )
             except Exception as e:
-                # TODO: LOGGING
                 raise e
             
             post_result = []
@@ -303,7 +332,9 @@ class boards_get_posts_view(LoginNeededView):
                         )
                     )
                 except Exception as e:
-                    # TODO: LOGGING
+                    logger.debug("Error at non-search post pagination")
+                    logger.debug("Board name:" + obj_board.name)
+                    logger.debug("num:" + str(num))
                     raise e
                 
             # 검색 획득
@@ -342,13 +373,18 @@ class boards_get_posts_view(LoginNeededView):
                     )
                 )
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Error at searching-post-pagination")
+                logger.debug("Board name: " + obj_board.name)
+                logger.debug("keyword: " + keyword)
+                logger.debug("num: " + num)
                 raise e
         
 
 
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -380,7 +416,7 @@ class boards_admin_view(LoginNeededView):
                     stauts=status.HTTP_400_BAD_REQUEST
                 )
             
-            if user in obj_board.admins:
+            if user in obj_board.admins.all():
                 is_admin = True
             else:
                 is_admin = False
@@ -391,8 +427,11 @@ class boards_admin_view(LoginNeededView):
                     data_field_name='is_admin'
                 )
             )
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
+            logger.debug("request_board_id: " + board_id_to_use)
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
