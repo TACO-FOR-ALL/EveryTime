@@ -12,6 +12,8 @@ from .utils import get_post_media_download_urls, check_post_if_with_media
 from EveryTimeBackend.utils import ResponseContent
 from EveryTimeBackend.view_template import LoginNeededView
 
+from loguru import logger
+
 class posts_realtime_best_view(LoginNeededView):
     """
         Developer: 
@@ -25,7 +27,7 @@ class posts_realtime_best_view(LoginNeededView):
                 pending=False,
                 is_deleted=False
             ).order_by('views')\
-             .order_by('-created_time')[:5] # 먼저 조회수 순으로 정렬, 그리고 최신순으로 정렬
+             .order_by('-created_at')[:5] # 먼저 조회수 순으로 정렬, 그리고 최신순으로 정렬
             
             result = []
             for post in posts:
@@ -53,8 +55,10 @@ class posts_realtime_best_view(LoginNeededView):
                     data_field_name='posts'
                 )
             )
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail('서버 에러!'),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -122,10 +126,13 @@ class posts_get_view(LoginNeededView):
                     )
                 )
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Error at post get")
+                logger.debug("Post id: " + str(obj_post.id))
                 raise e
         except Exception as e:
-            # TODO: LOGGING
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail('서버 에러!'),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -225,11 +232,14 @@ class posts_upload_view(LoginNeededView):
                         )
                     )
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Error at new post save")
+                logger.debug("Board id: " + str(obj_board.id))
                 raise e
 
-        except:
-           # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail('서버 에러!'),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -237,7 +247,7 @@ class posts_upload_view(LoginNeededView):
 
 class posts_upload_fail_view(LoginNeededView):
     def get(self, request: Request):
-        #user=self.get_user(request)
+        user=self.get_user(request)
         try:
             post_id_to_use = request.query_params.get('postid', None)
 
@@ -269,11 +279,14 @@ class posts_upload_fail_view(LoginNeededView):
                         data=ResponseContent.success()
                     )
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Error at post delete")
+                logger.debug("Post id: " + str(obj_post.id))
                 raise e
 
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail('서버 에러!'),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -322,10 +335,13 @@ class posts_like_view(LoginNeededView):
                         obj_post.like_users.delete(user)
                     obj_post.save()
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Error at post like set save")
+                logger.debug("Post id: " + str(obj_post.id))
                 raise e
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail('서버 에러!'),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -376,11 +392,14 @@ class posts_delete_view(LoginNeededView):
                     )
                         
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Error at post delete save")
+                logger.debug("Post id: " + str(obj_post.id))
                 raise e
 
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail('서버 에러!'),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR

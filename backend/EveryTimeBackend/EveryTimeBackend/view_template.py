@@ -18,8 +18,12 @@ class LoginNeededView(APIView):
         try:
             user, _ = jwt_authentication.authenticate(request)
         except Exception as e:
-            # TODO: Logging
-            # 인증 실패! raise error
+            from loguru import logger
+            logger.error("Error in get_user:")
+            logger.error("error_type:")
+            logger.error(type(e))
+            logger.error("error_msg:")
+            logger.error(str(e))
             raise AuthenticationFailed
         
         # 인증 완료, user obj 리턴

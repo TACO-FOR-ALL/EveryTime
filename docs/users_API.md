@@ -136,13 +136,11 @@ None
 
 ## 가입인증용이메일리스트요청
 
-- **URL**: `/users/organization/emails`
-- **METHOD**: `POST`
+- **URL**: `/users/organization/emails/?orgid=<org_id>`
+- **METHOD**: `GET`
 - **REQUEST PAYLOAD**:
 ```json
-{
-    "org_id":"string"
-}
+None
 ```
 |이름|타입|설명|
 | - | - | - |

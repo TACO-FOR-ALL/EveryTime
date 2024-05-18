@@ -26,7 +26,7 @@ urlpatterns = [
          views.users_organization_list_view.as_view(),
          name='users.organization.list'),
 
-    path("organization/emails", # 특정 학교/단체 가입 인증 가능 이메일 suffix 리스트
+    path("organization/emails/", # 특정 학교/단체 가입 인증 가능 이메일 suffix 리스트
          views.users_organization_mails_view.as_view(),
          name='users.organization.mails'),
 

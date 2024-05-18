@@ -11,6 +11,8 @@ from .models import *
 
 from EveryTimeBackend.utils import ResponseContent, generate_auth_code, send_auth_email
 from EveryTimeBackend.view_template import LoginNeededView
+
+from loguru import logger
     
 class CustomTokenRefreshView(TokenRefreshView):
     """
@@ -21,7 +23,8 @@ class CustomTokenRefreshView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         original_response = super().post(request, *args, **kwargs)
         if original_response.status_code != 200:
-            # TODO: LOGGING using original_response.data
+            logger.debug("JWT Refresh fail, error_data:")
+            logger.debug(original_response.data)
             return Response(data=ResponseContent.fail(error_msg='JWT 토큰 갱신 실패!'),
                             status=original_response.status_code)
         else:
@@ -52,8 +55,9 @@ class users_organization_list_view(APIView):
                     data_field_name="organizations"
                 )
             )
-        except Exception as e: # 서버 에러
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -62,12 +66,12 @@ class users_organization_list_view(APIView):
 class users_organization_mails_view(APIView):
     """
         Developer: Macchiato
-        API: /users/organization/emails
+        API: /users/organization/emails/?orgid=<org_id>
         기능: 선택한 학교/단체에서 인증에 사용할 수 있는 메일 제공
     """
-    def post(self, request: Request):
+    def get(self, request: Request):
         try:
-            org_id_to_use = request.data.get('org_id')
+            org_id_to_use = request.query_params.get('orgid', None)
 
             # Request에서 id 미제공
             if org_id_to_use is None:
@@ -90,8 +94,10 @@ class users_organization_mails_view(APIView):
             return Response(data=ResponseContent.success(data=result,
                                                          data_field_name='emails'))
 
-        except Exception as e: # 서버 에러
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("organization id: " + {org_id_to_use})
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -139,6 +145,8 @@ class users_organization_send_auth_email_view(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
 
+            # TODO: 마지막 발송 기록 query 후 일정 간격 안에 재발송 요청 금지
+
             # 메일 발송
             cur_auth_code = generate_auth_code()
             send_result, fail_reason = send_auth_email(receiver_email=email_to_use,
@@ -146,10 +154,11 @@ class users_organization_send_auth_email_view(APIView):
                                                        type=1)
             
             if not send_result:
-                # TODO: 인증 메일 발송 실패 LOGGING
                 if fail_reason:
                     raise Exception(fail_reason)
                 else:
+                    logger.debug("send_auth_mail() fail but no reason!")
+                    logger.debug(f"receiver_mail={email_to_use}, auth_code={cur_auth_code}, type=signup")
                     raise Exception("메일 발송 실패")
             
             try: # 인증 메일 발송 관련 DB 조작
@@ -168,11 +177,12 @@ class users_organization_send_auth_email_view(APIView):
                         ResponseContent.success()
                     )
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Error at Email-Auth save")
+                logger.debug("email: " + email_to_use)
                 raise e
-        except Exception as e: # 서버 에러
-            # TODO: LOGGING using str(e)
-            print(str(e))
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -217,15 +227,17 @@ class users_organization_check_auth_code_view(APIView):
                 )
             
             try: # 인증 완료
-                obj_EmailAuth.verified = True
-                obj_EmailAuth.save()
-            except:
-                # TODO: LOGGING
-                raise Exception("인증 완료 관련 DB 조작 실패")
-            
-            return Response(ResponseContent.success())
+                with transaction.atomic():
+                    obj_EmailAuth.verified = True
+                    obj_EmailAuth.save()
+                    return Response(ResponseContent.success())
+            except Exception as e:
+                logger.debug("Error at email auth verify result save")
+                logger.debug("Email: " + email_to_check)
+                raise e
         except Exception as e:
-            # TODO: LOGGING using str(e)
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -295,9 +307,11 @@ class users_signup_view(APIView):
                     new_user.save()
                     return Response(ResponseContent.success())
             except Exception as e:
+                logger.debug("Error at create new user")
                 raise e
         except Exception as e:
-            # TODO: LOGGING using str(e)
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -331,6 +345,8 @@ class users_login_view(APIView):
             
             # jwt token
             refresh = RefreshToken.for_user(user)
+            logger.info(f"Distributed refresh token: {str(refresh)}")
+            logger.info(f"Distributed access token: {str(refresh.access_token)}")
             return Response(
                 data=ResponseContent.success(
                     data={
@@ -341,7 +357,9 @@ class users_login_view(APIView):
                 )
             )
         except Exception as e:
-            # TODO: LOGGING using str(e)
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -378,10 +396,11 @@ class users_reset_password_send_auth_email_view(APIView):
                                                        type=2)
             
             if not send_result:
-                # TODO: 인증 메일 발송 실패 LOGGING
                 if fail_reason:
                     raise Exception(fail_reason)
                 else:
+                    logger.debug("send_auth_mail() fail but no reason!")
+                    logger.debug(f"receiver_mail={email_to_use}, auth_code={cur_auth_code}, type=reset-pw")
                     raise Exception("메일 발송 실패")
                 
             try: # 인증 메일 발송 관련 DB 조작
@@ -398,10 +417,12 @@ class users_reset_password_send_auth_email_view(APIView):
 
                     return Response(ResponseContent.success())
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Error at send reset-pw auth mail save")
+                logger.debug("Email: " + email_to_use)
                 raise e
-        except:
-            # TODO: LOGGING using str(e)
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -440,16 +461,18 @@ class users_reset_password_check_auth_code_view(APIView):
                 )
             
             try: # 인증 완료
-                obj_EmailAuth.verified = True
-                obj_EmailAuth.save()
-            except:
-                # TODO: LOGGING
-                raise Exception("인증 완료 관련 DB 조작 실패")
-            
-            return Response(ResponseContent.success())
+                with transaction.atomic():
+                    obj_EmailAuth.verified = True
+                    obj_EmailAuth.save()
+                    return Response(ResponseContent.success())
+            except Exception as e:
+                logger.debug("Error at reset-pw auth mail result save")
+                logger.debug("Email: " + email_to_check)
+                raise e
 
-        except:
-            # TODO: LOGGING using str(e)
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -501,10 +524,13 @@ class users_reset_password_set_password_view(APIView):
 
                     return Response(ResponseContent.success())
             except Exception as e:
-                # TODO: LOGGING
+                logger.debug("Error at reset-pw save")
+                logger.debug("Email: " + email_to_use)
                 raise e
             
-        except:
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -527,8 +553,10 @@ class users_nickname_view(LoginNeededView):
                     data_field_name='nickname'
                 )
             )
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
@@ -562,12 +590,13 @@ class users_nickname_view(LoginNeededView):
                         ResponseContent.success()
                     )
             except Exception as e:
-                # TODO: LOGGING
                 raise e
             
 
-        except:
-            # TODO: LOGGING
+        except Exception as e:
+            logger.error("Error at:" + self.__class__.__name__)
+            logger.error(str(e))
+            logger.debug("requesting_user: " + user.username)
             return Response(
                 data=ResponseContent.fail("서버 에러!"),
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR
