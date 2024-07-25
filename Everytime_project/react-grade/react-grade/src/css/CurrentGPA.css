@@ -1,0 +1,223 @@
+.course-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 2rem;
+}
+
+.course-table th,
+.course-table td {
+    border: 1px solid #ccc;
+    padding: 0.5rem;
+    text-align: center;
+}
+
+.course-table th {
+    background-color: #f4f4f4;
+}
+
+.input-field {
+    width: 100%;
+    max-width: 125px;
+    padding: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.input-field2 {
+    width: 100%;
+    max-width: 65px;
+    padding: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.input-field3 {
+    width: 100%;
+    max-width: 50px;
+    padding: 0.3rem;
+    font-size: 1rem;
+    margin-bottom: 0.1rem;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+}
+
+.button {
+    width: 63%;
+    background: rgb(83, 82, 82);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    padding: 0.5rem;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.button:hover {
+    background: #d8d7d7;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #ccc;
+}
+
+li input {
+    margin-right: 1rem;
+}
+
+h2 {
+    text-align: center;
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+}
+
+.main-home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    background: white;
+}
+
+.main-header {
+    text-align: center;
+    font-size: 2rem;
+    color: black;
+    margin-bottom: 2rem;
+}
+
+.main-content {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 5rem; /* 네비게이션 바와의 간격 확보 */
+    padding-bottom: 5rem; /* 추가된 여백 */
+}
+
+.selector-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.selector-container h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.selector-container select {
+    width: 100%;
+    max-width: 300px;
+    padding: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.button {
+    width: 50%;
+    background: black;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.button:hover {
+    background: #333;
+}
+
+.bottom-nav ul li {
+    display: inline;
+    padding: 0 10px;
+}
+
+.main-home-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 2rem;
+    background: white;
+    padding-bottom: 20rem; /* 네비게이션 바 공간 확보를 위해 아래 패딩 추가 */
+}
+
+.main-header {
+    text-align: center;
+    font-size: 2rem;
+    color: black;
+    margin-bottom: 2rem;
+}
+
+.main-content {
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 5rem; /* 네비게이션 바와의 간격 확보 */
+}
+
+.selector-container {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.selector-container h2 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.selector-container select {
+    width: 100%;
+    max-width: 300px;
+    padding: 0.5rem;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.button {
+    width: 50%;
+    background: black;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 0.75rem;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-bottom: 1rem;
+}
+
+.button:hover {
+    background: #333;
+}
+
+.bottom-nav ul li {
+    display: inline;
+    padding: 0 10px;
+}

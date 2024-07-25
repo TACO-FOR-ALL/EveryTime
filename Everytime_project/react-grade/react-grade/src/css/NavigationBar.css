@@ -1,0 +1,42 @@
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: #333;
+    z-index: 1000; /* 다른 요소들 위에 오도록 설정 */
+  }
+  
+  .bottom-nav ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+  }
+  
+  .bottom-nav li {
+    flex: 1;
+    text-align: center;
+  }
+  
+  .nav-button {
+    background: none;
+    border: none;
+    color: white;
+    text-decoration: none;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 1rem;
+    width: 100%;
+  }
+  
+  .nav-button:hover {
+    color: #ddd;
+  }
+  
+  body {
+    padding-bottom: 4rem; /* 네비게이션 바의 높이만큼 하단 여백 추가 */
+  }
+  

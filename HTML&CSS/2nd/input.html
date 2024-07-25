@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8">
+        <title>입력요소</title>
+
+        <!--
+        text
+        email
+        password
+        search
+        date
+
+        color
+        number
+        range
+        -->
+
+    </head>
+    <body>
+        <h1>로그인 해주세요</h1>
+        <label>
+            아이디:
+            <input type="text" placeholder="아이디">
+        </label>
+        <label>
+            비밀번호:
+            <input type="password" placeholder="비밀번호">
+        </label>
+        
+        <label for="pw">비밀번호</label>
+        <input type="password" id="pw" placeholder="비밀번호">
+
+        <hr/>
+
+        <input type="color">
+        <input type="number">
+        <input type="range">
+        <input type="checkbox">
+        <input type="date">
+        <input type="datetime">
+
+        <hr/>
+        
+        <label>
+            <input type="checkbox"> 제육볶음
+        </label>    
+        <label>
+            <input type="checkbox"> 돈까스
+        </label>
+        <label>
+            <input type="checkbox"> 순대국밥
+        </label>
+
+        <!--
+        input 외 여러 입력 태그들
+            <select>
+                <option></option>
+            </select>
+        -->
+
+        <h2>음료를 고르세요</h2>
+        <select>
+            <option value="coffee">커피</option>
+            <option value="coke">콜라</option>
+            <option value="juice" selected>쥬스</option>
+            <option value="water">생수</option>
+        </select>
+        <select multiple>
+            <option value="coffee">커피</option>
+            <option value="coke">콜라</option>
+            <option value="juice" selected>쥬스</option>
+            <option value="water">생수</option>
+        </select>
+        <select multiple size="2">
+            <option value="coffee">커피</option>
+            <option value="coke">콜라</option>
+            <option value="juice" selected>쥬스</option>
+            <option value="water">생수</option>
+        </select>
+
+        <h2>기타 음료를 원한다면 자유롭게 써주세요.</h2>
+        <textarea cols="30" rows="10"></textarea>
+
+        <h2>우리의 준비 상태는 아래와 같습니다.</h2>
+        <progress max="100" value="80"></progress>
+
+        <h2>추가 용무가 있으면 호출해주세요.</h2>
+        <button>호출</button>
+        <input type="button" value="호출">
+
+
+        <fieldset>
+            <legend>음료 주문</legend>
+            <h2>음료를 고르세요</h2>
+            <select multiple size="1">
+                <option value="coffee">커피</option>
+                <option value="coke">콜라</option>
+                <option value="juice" selected>쥬스</option>
+                <option value="water">생수</option>
+            </select>
+
+            <h2>기타 음료를 원한다면 자유롭게 써주세요.</h2>
+            <textarea cols="100" rows="5"></textarea>
+        </fieldset>
+        
+    </body>
+</html>

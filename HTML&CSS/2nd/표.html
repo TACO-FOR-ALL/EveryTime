@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="utf-8">
+        <title>표 만들기</title>
+        <!--
+            <table>:하나의 표를 나타내는 태그
+            <tr>:표 안에서 하나의 행을 나타내는 태그
+            <th>:행 안에서 제목에 해당하는 셀을 나타내는 태그
+            <td>:행 안에서 콘텐츠에 해당하는 셀을 나타내는 태그
+            <table border="1">:border 속성은 테이블 테두리의 두께를 조정한다.
+            <caption>:테이블 태그의 안쪽에서 제목 또는 표에 대한 설명을 나태는 역할을 수행한다. 캡션 태그의 콘텐츠는 기본적으로 가운데 정렬
+            
+            
+            태그라기보단 표의 구조 명확하게 표현하는 방법
+            <thead>:표의 제목이나 주제를 나타내는 영역
+            <tbody>:표의 본문을 나타내는 영역
+            <tfoot>:표의 요약글이나 맺음말을 나타내는 영역
+        -->
+        
+    </head>
+    <body>
+        <table border="1">
+            <caption>
+                <strong>마라톤 참가선수 명단</strong>
+            </caption>
+            <thead>
+                <tr>
+                    <th>한국선수</th>
+                    <th>미국선수</th>
+                    <th>일본선수</th>
+                </tr>   
+            </thead>
+
+            <tbody>
+                <tr>
+                    <td>서울</td>
+                    <td>오사카</td>
+                    <td>뉴욕</td>
+                </tr>
+            </tbody>
+
+            <tfoot>
+                <tr>
+                    <td>세계랭킹 1위</td>
+                    <td>세계랭킹 2위</td>
+                    <td>세계랭킹 3위</td>
+                </tr>
+            </tfoot>
+        </table>
+    </body>
+</html>

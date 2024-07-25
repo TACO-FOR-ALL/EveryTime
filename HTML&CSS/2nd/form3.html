@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="x-ua-compatible" content="IE=edge">
+    <title>설문조사 양식</title>
+</head>
+<body>
+    <header>
+        <h1>회원가입</h1>
+        <p>*표시된 모든 항목에 빠짐없이 기입해주십시오.</p>
+    </header>
+    <hr/>
+    <main>
+        <form>
+            <fieldset>
+                <legend>개인정보</legend>
+                <label for="name">*이름</label>
+                <input type="text" id="name" name="name" placeholder="본명을 입력하세요" size="15">
+                <br>
+                <label>*아이디</label>
+                <input type="email" id="email" name="email" placeholder="이메일 주소를 입력하세요" size="30">
+                <br>
+                <label>*비밀번호</label>
+                <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" size="30">
+                <br>
+                <label>*비밀번호 확인</label>
+                <input type="password" id="password" name="password" placeholder="비밀번호를 다시 한 번 입력하세요" size="30">
+                <br>
+                <label>*휴대폰 번호</label>
+                <input type="number" id="phone" name="phone" placeholder="전화번호를 입력하세요" size="30">
+                <br>
+            </fieldset>
+            <fieldset>
+                <legend>추가정보</legend>
+                <label>
+                <input type="checkbox" id="male" name="male"> 남자
+                <input type="checkbox" id="female" name="female"> 여자
+                </label>
+                <br>
+                <label>생년월일</label>
+                <input type="date" id="birthday" name="birthday">
+                <br>
+                <label>추천인 이메일 주소</label>
+                <input type="email" id="email" name="email" placeholder="추천인 이메일 주소를 입력하세요" size="30">
+            </fieldset>
+            <button>가입하기</button>
+    </main>
+    <hr/>
+    <footer>
+        <p>입력하시느라 수고하셨습니다.</p>
+    </footer>
+</body>
+</html>
