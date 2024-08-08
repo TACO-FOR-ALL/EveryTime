@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <input id="talk">
+    <input id ="push" type ="button" value="push">
+
+    <form id="form">
+        <input name="name">
+        <input name="nick">
+        <input type="submit">
+    </form>
+
+    <script>
+        const form = document.getElementById("form");
+        form.addEventListener("submit",function(e){
+            e.preventDefault() //새로고침 차단
+            const p = document.createElement("p");
+            p.textContent = `${e.target.name.value}의 별명은 ${e.target.nick.value}`
+            document.body.append(p);
+        })
+    </script>
+    
+</body>
+</html>

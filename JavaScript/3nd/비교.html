@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+</head>
+<body>
+
+    <script>
+        let age = parseInt(prompt("당신의 나이는?"));
+        console.log(20<=age);
+        console.log(20==age); //값이 같은 추상적 비교
+        console.log(20===age); //값이 같고 자료형 까지 같아야 한다. 엄격한 비교!
+
+        let name = prompt("당신의 이름은?");
+        document.write("최준원" === name) //dom에 추가할 수 있는 기능
+
+        let name1 = prompt("당신의 이름은?");
+        document.write(`사용자의 이름은 ${name1} 입니다.<br>`); //dom에 추가할 수 있는 기능
+        document.write(`우리가 찾던 사람인가? ${"최준원" === name1}`);
+    </script>
+    
+</body>
+</html>

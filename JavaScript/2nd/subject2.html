@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>사용자 선택에 따른 메시지 출력</title>
+    <style>
+      /* 스타일을 추가하여 메시지를 중앙 정렬하고 폰트를 설정하세요 */
+      #update{
+        font-size : 1000px;
+        color: #000000;
+      }
+      #name{
+        font-size : 80px;
+        color:#1eb8b0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 메시지를 출력할 div 요소 -->
+    <div id="update"></div>
+    <div id="name"></div>
+    <script>
+      //1. 사용자에게 "페이지를 업데이트 하시겠습니까?"라는 확인 대화 상자를 표시한다.
+      const confirmation = confirm('페이지를 업데이트 하시겠습니까?');
+      //2. 사용자가 "확인"을 클릭하면 페이지에 "페이지가 업데이트되었습니다!"라는 메시지를 출력한다.
+      //3. 사용자가 "취소"를 클릭하면 페이지에 "페이지 업데이트가 취소되었습니다."라는 메시지를 출력한다.
+      //4. 사용자가 페이지 업데이트를 선택한 경우, 추가로 사용자 이름을 입력받고 "안녕하세요, [이름]님!"이라는 메시지를 출력한다.
+      if (confirmation) {
+        const div_update = document.querySelector('#update');
+        div_update.textContent = '페이지가 업데이트 되었습니다!';
+        const div_name = document.querySelector('#name');
+        const name = prompt('이름을 입력해주세요~');
+        div_name.textContent = `안녕하세요, ${name}님!`;
+      } else {
+        const div_update = document.querySelector('#update');
+        div_update.textContent = '페이지 업데이트가 취소되었습니다!';
+      }
+    </script>
+  </body>
+</html>

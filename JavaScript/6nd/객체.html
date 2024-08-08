@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>객체를 만드는 생성자</title>
+</head>
+<body>
+    <script>
+        function BestSinger(SingerName, SingerMember){
+            this.name = SingerName;
+            this.member = SingerMember;
+            this.singing = function(){
+                console.log("니 이름 불렀나봐~ 술에 취해서~")
+            }
+        }
+        const one = new BestSinger(prompt("그룹 명을 알려주세요!"),prompt("그룹 멤버 이름들을 알려주세요"))
+        console.log(one.name);
+        console.log(one.member);
+        one.singing;
+    </script>
+    
+</body>
+</html>

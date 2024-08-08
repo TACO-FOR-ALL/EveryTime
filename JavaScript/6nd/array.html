@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+    <script>
+        const vos = ["박지헌", "최현준", "김경록"]
+        //배열의 끝 부분에 요소 생성
+        vos.push("최준원");
+        console.log(vos);
+
+        // 배열의 끝부분부터 요소 제거
+        vos.pop();
+        console.log(vos);
+
+        //주어진 요소의 유무를 인덱스 번호로 확인
+        console.log(vos.indexOf("최현준"))
+
+        //0부터 2개 제거
+        //박지헌 최현준 김경록 제거 후 지헌 현준으로 대체
+        vos.splice(0,3,"지헌","현준")
+        console.log(vos)
+
+        //forEach: 배열의 개별 요소에 대한 함수를 차례대로 호출
+        vos.forEach(function(item){
+            console.log("forEach에서 호출된 아이템: " + item);
+        })
+
+    </script>
+    
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>chapter2의 첫번째 문제 입니다.</title>
+  </head>
+  <body>
+    <h1 id="poetry" class="heading" title="지은이: 나태주">
+      <span>사는 법</span>
+    </h1>
+    <p class="first">그운 날은 그림을 그리고</p>
+    <span class="first">쓸쓸한 날은 음악을 들었다</span>
+    <p class="second">그리고도 남는 날은</p>
+    <p class="third">너를 생각해야만 했다</p>
+
+    <script>
+      //.querySelectorAll를 이용해 클래스명 first와 second가 가지고 있는 모든 요소를 찾아 console.log로 출력해주세요
+      const f = document.querySelectorAll(".first")
+      console.log(f)
+      const s = document.querySelectorAll(".second")
+      console.log(s)
+      //.getElementsByClassName를 이용해 클래스명 third의 요소를 console.log로 출력해주세요
+      const t = document.getElementsByClassName("third");
+      console.log(t);
+      // .getElementById를 이용해 id poetry의 요소를 가져와 title이라는 변수에 넣고 console.log로 출력해주세요
+      const title = document.getElementById("poetry");
+      console.log(title);
+      // title 변수 내 텍스트 콘텐츠를 가져와 console.log로 출력해주세요
+      console.log(title.textContent)
+      // title 변수 내 html 코드를 가져와 console.log로 출력해주세요
+      console.log(title.innerHTML)
+      // title 변수 내 className 정보를 가져와 console.log로 출력해주세요
+      console.log(title.className)
+      // title 변수 내 style 정보를 과져와 console.log로 출력해주세요
+      console.log(title.style)
+      // title 변수내 title 정보를 가져와 console.log로 출력해주세요
+      console.log(title.title)
+    </script>
+  </body>
+</html>

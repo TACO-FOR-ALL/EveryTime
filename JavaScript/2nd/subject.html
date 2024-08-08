@@ -1,0 +1,62 @@
+<!-- 1강부터 10강까지 학습한 내용을 바탕으로 나만의 사용자 정보 입력받기 폼을 만들어보자 -->
+<!DOCTYPE html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>사용자 정보 입력받고 출력하기</title>
+    <style>
+      /* 스타일을 여기에 추가하세요 */
+      #f_color{
+        color: blue;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 사용자 이름을 출력할 h1 태그 -->
+    <h1 id="name"></h1>
+
+    <!-- 사용자 나이를 출력할 p 태그 -->
+    <p id="age"></p>
+
+    <!-- 사용자가 좋아하는 색을 출력할 p 태그 -->
+    <p id="f_color"></p>
+  </body>
+  <script>
+    //1. 사용자로부터 이름, 나이, 좋아하는 색깔을 입력받는다.
+    const name = prompt("이름을 입력해주세요");
+    const age = parseInt(prompt("나이를 숫자만 입력해주세요!"));
+    const color = prompt("좋아하는 색상을 입력해주세요~");
+
+    //2. h1 태그에 사용자 이름을 출력한다.
+    const h1 = document.querySelector("#name");
+    h1.textContent = `사용자 이름: ${name}`;
+
+    //3. p 태그에 나이에 대한 정보를 출력한다: "당신의 나이는 [나이]세입니다."
+    const p1 = document.querySelector("#age")
+    if(Number.isInteger(age)){
+        p1.textContent = age;
+    }else{
+        alert("숫자만 입력하세요!");
+    }
+
+    //4. p 태그에 좋아하는 색깔을 출력한다: "좋아하는 색깔은 [색깔]입니다!" - 이 정보는 파란색으로 표시되어야 합니다.
+    const p2 = document.querySelector("#f_color");
+    p2.textContent = `${name}님이 좋아하는 색깔은 ${color}이군요!`;
+
+    //5. 사용자에게 "취소나 확인을 눌러보시겠습니까?" 라는 confirm 창을 띄운다.
+    const confirmation = confirm("취소나 확인을 눌러보시겠습니까?")
+    if(confirmation){
+        alert("확인 버튼을 누르셨군요!")
+    }else{
+        alert("취소 버튼을 누르셨군요!")
+    }
+
+    //6. 색깔의 타입을 typeof 연산자를 사용하여 콘솔에 출력한다.
+    console.log(`색깔의 타입은 ${typeof(color)}`)
+
+    //7. confirm이 true인지 false인지 콘솔에 출력한다.
+    console.log(`confirm의 boolean값은: ${confirmation}`)
+    
+  </script>
+</html>

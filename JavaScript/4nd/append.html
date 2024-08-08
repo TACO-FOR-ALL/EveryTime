@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>createElement&appendchild()</title>
+</head>
+<body>
+    <div id="container">
+    </div>
+
+    <script>
+        for(let a = 1; a<=5; a++){
+        const div = document.getElementById("container"); 
+        const box = document.createElement("div");
+        box.style.color="blue";
+        box.style.width="220px";
+        box.style.hight="100px";
+        box.textContent = "헷갈리지만 재밌고 신기하다!"
+        div.append(box);
+    }
+    </script>
+</body>
+</html>

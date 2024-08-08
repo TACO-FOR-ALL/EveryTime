@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+
+    <script>
+        // TODO: 조건에 맞는 div 요소를 생성하는 함수 createDiv를 작성하고, createDiv를 str의 길이만큼 호출하세요.
+        let str = '0123456';
+        const body = document.querySelector('body');
+
+        function createDiv(content, backgroundColor) {
+        const div = document.createElement('div');
+        // 조건1. div 요소의 textContent와 배경색은 외부에서 입력받은 content, backgroundColor가 되어야 합니다.
+        div.textContent = content;
+        div.style.backgroundColor = backgroundColor;
+        // 조건2. div 요소의 padding 값은 상하 10px, 좌우 20px이 되어야 합니다.
+        div.style.padding = '10px 20px';
+        // 조건3. div 요소의 margin은 상 5px, 우 2px, 하 3px, 좌 8px가 되어야 합니다.
+        div.style.margin = '5px 2px 3px 8px';
+        // 조건4. div 요소의 글자색은 'white'가 되어야 합니다.
+        div.style.color = 'white';
+        // 여기에 코드를 작성하세요.
+        document.body.appendChild(div);
+        }
+        // TODO: for 반복문을 사용하여 createDiv를 호출하세요.
+        // 원하는 매개변수를 넣어보세요.
+        for (let i = 1; i <= str.length; i++) {
+        createDiv(`${i}번째 div입니다.`, 'blue');
+        // 여기에 코드를 작성하세요.
+        }
+    </script>
+    
+</body>
+</html>

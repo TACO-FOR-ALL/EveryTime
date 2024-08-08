@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>문자열prompt + 템플릿 리터럴</title>
+</head>
+<body>
+    <script>
+        let apple;
+        apple = "사과";
+        console.log(apple);
+        let banana = "바나나";
+        console.log(apple+" & "+banana);
+
+        //let answer = window.prompt("당신이 좋아하는 과일은?")
+        let answer = prompt("당신이 좋아하는 과일은?")
+        alert(answer);
+
+        const data1 = "데이터"
+        const str1 = `문자열 중간에 ${data1} 삽입하기`
+        console.log(str1);
+
+        const data2 = "100";
+        const str2 = `숫자도 문자로 녹아든다 : ${data2} !`
+        console.log(str2);
+
+        const str3 = `문자 입력 받아서 바로 출력하기 ${prompt('문자를 입력해주세요')}`;
+        console.log(str3);
+
+        const dog = "강아지";
+        const cat = "고양이";
+        console.log(typeof cat);
+
+        const modifier = "귀여운"
+        const prettyDog = `${modifier} ${dog}와 ${prompt("좋아하는 동물은?")}가 좋아요!`;
+        console.log(prettyDog);
+    </script>
+</body>
+</html>
